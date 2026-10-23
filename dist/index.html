@@ -42,6 +42,11 @@
         </div>
       </section>
 
+      <section>
+        <p class="eyebrow">Reference map</p>
+        <button id="basemapToggle" class="basemap-button active" type="button" aria-pressed="true"><i aria-hidden="true">⌘</i><span><strong>OpenStreetMap basemap</strong><small id="basemapStatus">Visible · roads and places</small></span></button>
+      </section>
+
       <label class="field-label">Pressure constraint<span class="field-with-unit"><input id="limitInput" type="number" value="25" min="1" max="100" step="1"><small>bar Δp</small></span></label>
       <button id="evaluateButton" class="primary-button">Evaluate scenario</button>
       <p class="control-note"><span>i</span>Fault reactivation is not inferred from pressure alone. A calibrated geomechanical threshold and monitoring plan are required.</p>
@@ -54,6 +59,7 @@
       </div>
       <div class="map-canvas">
         <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
+        <div id="osmAttribution" class="osm-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">Report map issue</a></div>
         <div class="map-search"><span aria-hidden="true">⌖</span><input id="searchInput" type="search" placeholder="Find project or reservoir cell" aria-label="Find project or reservoir cell"><button id="fitButton">Fit model</button></div>
         <div class="map-legend"><div><span id="legendLow">0</span><strong id="legendUnit">Δp · bar</strong><span id="legendHigh">25</span></div><i id="legendRamp"></i><small id="legendCaption">P50 analytical ensemble</small></div>
         <div class="map-key"><span><i class="storage-dot"></i>CO₂ storage</span><span><i class="geothermal-dot"></i>Geothermal</span><span><i class="fault-line"></i>Illustrative fault</span></div>
