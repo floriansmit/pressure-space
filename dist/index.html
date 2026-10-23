@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
+  <title>DECODE Pressure Space</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">◆</div>
+      <div class="brand"><h1>DECODE</h1><p>SUBSURFACE PRESSURE MANAGEMENT</p></div>
+      <div class="topbar-status"><span class="status-dot"></span><span id="engineLabel">Loading ensemble…</span><span class="topbar-divider"></span><button id="aboutButton" class="text-button">Model boundary</button></div>
+    </header>
+
+    <aside class="control-panel">
+      <section><p class="eyebrow">Regional scenario</p><h2>Pressure space</h2><p class="panel-intro">Explore pressure interference between CO₂ storage and geothermal operations. Values are screening results until a calibrated OPM case is completed.</p></section>
+
+      <label class="field-label">Reservoir<select id="reservoirSelect" class="field-select"></select></label>
+
+      <section class="project-card">
+        <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Alpha</strong><small>Illustrative injection project</small></div><span class="status-badge">ACTIVE</span></div>
+        <label class="range-field"><span>Injection rate <output id="rateOutput">1.2 Mt/yr</output></span><input id="rateInput" type="range" min="0.2" max="3" step="0.1" value="1.2"></label>
+        <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><input id="durationInput" type="range" min="1" max="40" step="1" value="20"></label>
+      </section>
+
+      <section class="time-controls">
+        <div class="section-heading"><div><p class="eyebrow">Timeline</p><strong>Displayed state</strong></div><output id="yearOutput">Year 12</output></div>
+        <input id="yearInput" type="range" min="1" max="60" step="1" value="12">
+        <div class="time-scale"><span>Start</span><span>Injection stops</span><span>Post-injection</span></div>
+      </section>
+
+      <section>
+        <p class="eyebrow">Result layer</p>
+        <div class="layer-list" role="group" aria-label="Result layer">
+          <button class="layer-button active" data-layer="pressure"><i class="pressure-swatch"></i><span><strong>Pressure change</strong><small>Regional Δp</small></span></button>
+          <button class="layer-button" data-layer="margin"><i class="margin-swatch"></i><span><strong>Pressure margin</strong><small>Remaining headroom</small></span></button>
+          <button class="layer-button" data-layer="geothermal"><i class="geo-swatch"></i><span><strong>Geothermal impact</strong><small>Injection cost effect</small></span></button>
+        </div>
+      </section>
+
+      <label class="field-label">Pressure constraint<span class="field-with-unit"><input id="limitInput" type="number" value="25" min="1" max="100" step="1"><small>bar Δp</small></span></label>
+      <button id="evaluateButton" class="primary-button">Evaluate scenario</button>
+      <p class="control-note"><span>i</span>Fault reactivation is not inferred from pressure alone. A calibrated geomechanical threshold and monitoring plan are required.</p>
+    </aside>
+
+    <main class="map-panel">
+      <div class="map-heading">
+        <div><p id="reservoirSubtitle">Regional aquifer</p><h2 id="mapTitle">Pressure change · Year 12</h2></div>
+        <div class="percentiles" role="group" aria-label="Percentile"><button data-p="10">P10</button><button data-p="50" class="active">P50</button><button data-p="90">P90</button></div>
+      </div>
+      <div class="map-canvas">
+        <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
+        <div class="map-search"><span aria-hidden="true">⌖</span><input id="searchInput" type="search" placeholder="Find project or reservoir cell" aria-label="Find project or reservoir cell"><button id="fitButton">Fit model</button></div>
+        <div class="map-legend"><div><span id="legendLow">0</span><strong id="legendUnit">Δp · bar</strong><span id="legendHigh">25</span></div><i id="legendRamp"></i><small id="legendCaption">P50 analytical ensemble</small></div>
+        <div class="map-key"><span><i class="storage-dot"></i>CO₂ storage</span><span><i class="geothermal-dot"></i>Geothermal</span><span><i class="fault-line"></i>Illustrative fault</span></div>
+        <div id="mapTooltip" class="map-tooltip" hidden></div>
+      </div>
+    </main>
+
+    <aside class="detail-panel">
+      <div class="detail-header"><div class="detail-icon">⌖</div><div><p>Selected receptor</p><h2 id="selectedName">GeoHeat North</h2></div></div>
+      <section class="pressure-budget">
+        <div><span>Pressure-space use</span><strong id="budgetValue">—</strong></div>
+        <div class="budget-track"><i id="budgetBar"></i><b title="Pressure constraint"></b></div>
+        <p id="budgetCaption">Select a model cell to inspect its pressure headroom.</p>
+      </section>
+      <section class="metric-grid">
+        <div><span>Predicted Δp</span><strong id="pressureValue">—</strong><small id="pressureContext">Selected percentile</small></div>
+        <div><span>Remaining margin</span><strong id="marginValue">—</strong><small>to configured constraint</small></div>
+        <div><span>Injection pumping</span><strong id="injectionCost">—</strong><small>indicative electricity change</small></div>
+        <div><span>Production lift</span><strong id="productionCost">—</strong><small>indicative electricity change</small></div>
+      </section>
+      <section class="chart-section">
+        <div class="section-heading"><div><p class="eyebrow">Pressure trajectory</p><strong>At selected receptor</strong></div><span id="chartPercentile">P50</span></div>
+        <svg id="pressureChart" viewBox="0 0 320 165" role="img" aria-label="Pressure trajectory at selected location"></svg>
+      </section>
+      <section class="envelope-section">
+        <p class="eyebrow">Operational envelope</p><h3 id="envelopeTitle">Calculating scenario…</h3>
+        <p id="envelopeText">The envelope reports the first binding model constraint and uncertainty.</p>
+        <dl><div><dt>Indicative maximum rate</dt><dd id="maxRate">—</dd></div><div><dt>Binding screen</dt><dd id="bindingConstraint">—</dd></div><div><dt>Model confidence</dt><dd>Screening</dd></div></dl>
+      </section>
+      <footer><span class="status-dot"></span><span id="provenance">Loading provenance…</span></footer>
+    </aside>
+  </div>
+
+  <dialog id="aboutDialog">
+    <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
+    <p class="eyebrow">Scientific boundary</p><h2>What this MVP can and cannot answer</h2>
+    <p>The interactive map uses a 160-member analytical radial-diffusivity ensemble conditioned by the DECODE property grid. It is useful for interface development and first-order screening, but it is not an OPM CO₂ storage result.</p>
+    <p>The repository also contains a populated OPM Flow <code>CO2STORE</code> deck generator. Full-physics results require OPM under Linux/WSL2, geological calibration, fluid data, fault transmissibilities, geomechanical thresholds, and review by qualified reservoir and geomechanics specialists.</p>
+    <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
