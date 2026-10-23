@@ -16,7 +16,7 @@
     </header>
 
     <aside class="control-panel">
-      <section><p class="eyebrow">Regional scenario</p><h2>Pressure space</h2><p class="panel-intro">Explore pressure interference between CO₂ storage and geothermal operations. Values are screening results until a calibrated OPM case is completed.</p></section>
+      <section><p class="eyebrow">Regional scenario</p><h2>Pressure space</h2><p class="panel-intro">Explore pressure interference between CO₂ storage and geothermal operations. Gassum uses an OPM Flow screening ensemble; other formations remain analytical proxies.</p></section>
 
       <label class="field-label">Reservoir<select id="reservoirSelect" class="field-select"></select></label>
 
@@ -38,6 +38,7 @@
           <button class="layer-button active" data-layer="pressure"><i class="pressure-swatch"></i><span><strong>Pressure change</strong><small>Regional Δp</small></span></button>
           <button class="layer-button" data-layer="margin"><i class="margin-swatch"></i><span><strong>Pressure margin</strong><small>Remaining headroom</small></span></button>
           <button class="layer-button" data-layer="geothermal"><i class="geo-swatch"></i><span><strong>Geothermal impact</strong><small>Injection cost effect</small></span></button>
+          <button class="layer-button" data-layer="co2"><i class="co2-swatch"></i><span><strong>CO₂ plume</strong><small>OPM gas saturation</small></span></button>
         </div>
       </section>
 
@@ -89,8 +90,8 @@
   <dialog id="aboutDialog">
     <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
     <p class="eyebrow">Scientific boundary</p><h2>What this MVP can and cannot answer</h2>
-    <p>The interactive map uses a 160-member analytical radial-diffusivity ensemble conditioned by the DECODE property grid. It is useful for interface development and first-order screening, but it is not an OPM CO₂ storage result.</p>
-    <p>The repository also contains a populated OPM Flow <code>CO2STORE</code> deck generator. Full-physics results require OPM under Linux/WSL2, geological calibration, fluid data, fault transmissibilities, geomechanical thresholds, and review by qualified reservoir and geomechanics specialists.</p>
+    <p>The Gassum view now uses nine successful OPM Flow 2026.04 <code>CO2STORE</code> simulations. Its P10/P50/P90 fields span low, central, and high permeability, porosity, and net-thickness cases. The CO₂ plume layer is read directly from simulated gas saturation.</p>
+    <p>This remains a generic regional screening model, not a history-matched or permitting model. Other formations still use the analytical proxy. Decisions require calibrated geology and fluids, fault transmissibilities, coupled geomechanics, operational well constraints, monitoring data, and review by qualified reservoir and geomechanics specialists.</p>
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
   </dialog>
 

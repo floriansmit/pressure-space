@@ -126,9 +126,16 @@ END
 """
 
 
-def build_deck(case_name: str, rate_mt_yr: float, years: int) -> str:
+def build_deck(
+    case_name: str,
+    rate_mt_yr: float,
+    years: int,
+    permeability_md: float = 250.0,
+    porosity: float = 0.22,
+    thickness_m: float = 72.0,
+) -> str:
     nx, ny, nz = 60, 50, 6
-    layer_thickness_m = 12.0
+    layer_thickness_m = thickness_m / nz
     top_depth_m = 1800.0
     # OPM's CO2 surface-volume convention depends on the selected PVT model.
     # This MVP conversion is a documented scenario parameter, not a mass audit.
@@ -137,12 +144,14 @@ def build_deck(case_name: str, rate_mt_yr: float, years: int) -> str:
         case_name=case_name.upper(), nx=nx, ny=ny, nz=nz, nxy=nx * ny,
         top_depth_m=top_depth_m, bottom_depth_m=top_depth_m + nz * layer_thickness_m,
         datum_depth_m=top_depth_m - 200, cell_size_m=2000,
-        layer_thickness_m=layer_thickness_m, permeability_md=250,
-        vertical_permeability_md=25, porosity=0.22,
+        layer_thickness_m=layer_thickness_m, permeability_md=permeability_md,
+        vertical_permeability_md=permeability_md * 0.1, porosity=porosity,
         rock_compressibility_bar_inv="5e-05", temperature_c=65,
         initial_pressure_bar=180, well_i=nx // 2, well_j=ny // 2,
         surface_rate_sm3_day=round(surface_rate), max_bhp_bar=285,
-        tsteps=" ".join(["12*30"] * years),
+        # Annual report steps are sufficient for the explorer and make ensemble
+        # runs dramatically smaller than the initial monthly validation case.
+        tsteps=f"{years}*365",
     )
 
 
@@ -151,10 +160,23 @@ def main() -> None:
     parser.add_argument("--case", default="gassum_base")
     parser.add_argument("--rate", type=float, default=1.0, help="Mt CO2/year")
     parser.add_argument("--years", type=int, default=20)
+    parser.add_argument("--permeability", type=float, default=250.0, help="Horizontal permeability (mD)")
+    parser.add_argument("--porosity", type=float, default=0.22)
+    parser.add_argument("--thickness", type=float, default=72.0, help="Total aquifer thickness (m)")
     parser.add_argument("--output", type=Path, default=Path("runs/GASSUM_BASE.DATA"))
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(build_deck(args.case, args.rate, args.years), encoding="utf-8")
+    args.output.write_text(
+        build_deck(
+            args.case,
+            args.rate,
+            args.years,
+            permeability_md=args.permeability,
+            porosity=args.porosity,
+            thickness_m=args.thickness,
+        ),
+        encoding="utf-8",
+    )
     print(args.output.resolve())
 
 

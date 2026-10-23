@@ -1,0 +1,4 @@
+opm/runs/output/
+opm/ensemble-runs/
+__pycache__/
+*.pyc
