@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.4.0">
+  <link rel="stylesheet" href="styles.css?v=0.5.0">
 </head>
 <body>
   <div class="app-shell">
@@ -88,6 +88,20 @@
       <div class="map-canvas">
         <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
         <canvas id="model3d" aria-label="Interactive three-dimensional Gassum structure, faults and wells" hidden></canvas>
+        <div id="viewer3dUi" class="viewer-3d-ui" hidden>
+          <div class="viewer-instructions">Drag to rotate · Scroll to zoom · Click the surface to inspect</div>
+          <div class="viewer-toolbar" aria-label="3D camera controls">
+            <button id="sceneZoomIn" type="button" aria-label="Zoom 3D view in">+</button><button id="sceneZoomOut" type="button" aria-label="Zoom 3D view out">−</button><button id="sceneTop" class="top-view" type="button" title="Top view">TOP</button><button id="sceneReset" type="button" title="Reset 3D view" aria-label="Reset 3D view">↻</button>
+          </div>
+          <div class="viewer-layers">
+            <div><strong>▱ Layers</strong><small>Pressure model</small></div>
+            <button id="sceneSurface" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch data"></i><span>Gassum data surface<small id="sceneSurfaceCaption">Pressure change · P50</small></span></button>
+            <button id="sceneFaults" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch faults"></i><span>Fault set<small>29 vertical fault curtains</small></span></button>
+            <button id="sceneWells" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch wells"></i><span>Legacy well paths<small>8 vertical screening paths</small></span></button>
+            <label>Vertical exaggeration <strong id="verticalExaggerationValue">1.8×</strong><input id="verticalExaggeration" type="range" min="1" max="3" step="0.1" value="1.8"></label>
+            <p>Well paths use supplied collar positions and assumed vertical traces; deviation surveys are not available in this model.</p>
+          </div>
+        </div>
         <div id="osmAttribution" class="osm-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">Report map issue</a></div>
         <div class="map-search"><span aria-hidden="true">⌖</span><input id="searchInput" type="search" placeholder="Find project or reservoir cell" aria-label="Find project or reservoir cell"><button id="fitButton">Fit model</button></div>
         <div class="map-controls"><button id="zoomIn" type="button" aria-label="Zoom in">+</button><button id="zoomOut" type="button" aria-label="Zoom out">−</button><output id="zoomReadout">100%</output></div>
@@ -132,6 +146,6 @@
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
   </dialog>
 
-  <script src="app.js?v=0.4.0"></script>
+  <script src="app.js?v=0.5.0"></script>
 </body>
 </html>

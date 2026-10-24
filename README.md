@@ -11,7 +11,10 @@ Separate MVP for regional pressure management across CO2 storage and geothermal 
   restart files and exposes pressure P10/P50/P90 plus a CO2 plume layer.
 - The map includes wheel/button zoom, drag pan, OpenStreetMap, four geological
   model properties, eight supplied legacy wells, 29 supplied fault traces, and
-  a rotatable 3D top-structure view.
+  a connected-surface 3D top-structure view. The 3D view follows the geothermal
+  explorer controls: orbit/scroll navigation, zoom buttons, top and reset
+  camera presets, selectable surface/fault/well layers, vertical exaggeration,
+  labelled well paths, and click-to-inspect cells.
 - All 29 supplied faults are represented together as vertical Gassum baffles.
   Every trace receives the selected open (1.0), semi-open (0.05), or closed
   (0.0001) transmissibility multiplier.
