@@ -131,7 +131,7 @@ def main() -> None:
     reservoir["storage_projects"] = [
         {"id": "alpha", "name": "Storage Alpha", "enabled": True, "rate_mt_yr": 1.0, **grid_location(30, 25)},
         {"id": "beta", "name": "Storage Beta", "enabled": False, "rate_mt_yr": 1.0, **grid_location(28, 20)},
-        {"id": "zeta", "name": "Storage Zeta", "enabled": False, "rate_mt_yr": 1.0, "cell_id": 682, **grid_location(42, 30)},
+        {"id": "zeta", "name": "Storage Zeta", "enabled": False, "rate_mt_yr": 1.0, "cell_id": 192, "lon": points[191]["lon"], "lat": points[191]["lat"]},
     ]
     reservoir["fault_scenarios"] = {
         "modelled_fault_ids": [fault["id"] for fault in json.loads((HERE.parent / "dist" / "data" / "regional-context.json").read_text(encoding="utf-8"))["faults"]],
@@ -142,7 +142,7 @@ def main() -> None:
     }
     reservoir["ensemble_size"] = len(CASES)
     reservoir["ensemble_design"] = "L9 property ensemble for each all-fault state and Alpha/Beta/Zeta unit response"
-    data["model_version"] = "decode-pressure-opm-all-faults-0.4.0"
+    data["model_version"] = "decode-pressure-opm-all-faults-0.6.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

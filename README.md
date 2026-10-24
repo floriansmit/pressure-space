@@ -19,7 +19,7 @@ Separate MVP for regional pressure management across CO2 storage and geothermal 
   Every trace receives the selected open (1.0), semi-open (0.05), or closed
   (0.0001) transmissibility multiplier.
 - Storage Alpha and Beta are explicit screening placements. Storage Zeta is at
-  Cell 682. They are not optimized or proposed development locations.
+  Cell 192 (OPM I=43, J=9). They are not optimized or proposed development locations.
 - Beta and Zeta can each be screened at 1, 2, or 3 Mt CO2/year. The browser
   superposes their 1 Mt/year OPM response increments on Alpha; this is a fast
   screening approximation rather than a fully coupled nonlinear combination.

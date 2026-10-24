@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.5.0">
+  <link rel="stylesheet" href="styles.css?v=0.6.0">
 </head>
 <body>
   <div class="app-shell">
@@ -33,7 +35,7 @@
       </section>
 
       <section class="project-card zeta-card">
-        <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Zeta</strong><small>Located at model Cell 682</small></div><label class="toggle"><input id="zetaToggle" type="checkbox"><span></span></label></div>
+        <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Zeta</strong><small>Located at model Cell 192</small></div><label class="toggle"><input id="zetaToggle" type="checkbox"><span></span></label></div>
         <div class="project-status"><label>Injection rate <select id="zetaRate"><option value="1">1 Mt/yr</option><option value="2">2 Mt/yr</option><option value="3">3 Mt/yr</option></select></label><strong id="zetaStatus">OFF</strong></div>
       </section>
 
@@ -141,11 +143,11 @@
     <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
     <p class="eyebrow">Scientific boundary</p><h2>What this MVP can and cannot answer</h2>
     <p>The Gassum view uses 81 successful OPM Flow 2026.04 <code>CO2STORE</code> simulations: nine property realizations, three shared all-fault transmissibilities, and Alpha/Beta/Zeta unit responses. The 1–3 Mt/yr project controls use transparent unit-response superposition for regional screening.</p>
-    <p>All 29 supplied fault traces are represented as one vertical transmissibility set through the six Gassum layers. Storage Alpha, Beta and Zeta are screening placements rather than optimized or permit-ready well locations; Zeta is fixed at model Cell 682.</p>
+    <p>All 29 supplied fault traces are represented as one vertical transmissibility set through the six Gassum layers. Storage Alpha, Beta and Zeta are screening placements rather than optimized or permit-ready well locations; Zeta is fixed at model Cell 192.</p>
     <p>This remains a generic regional screening model, not a history-matched or permitting model. Decisions require calibrated geology and fluids, fault properties, coupled geomechanics, operational constraints, monitoring data, and qualified reservoir and geomechanics review.</p>
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
   </dialog>
 
-  <script src="app.js?v=0.5.0"></script>
+  <script src="app.js?v=0.6.0"></script>
 </body>
 </html>

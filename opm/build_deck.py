@@ -221,9 +221,9 @@ def build_deck(
     beta_compdat = f"INJ2 28 20 1 {nz} OPEN 2* 0.3 /" if beta_rate_mt_yr > 0 else ""
     beta_winjgas = "INJ2 STREAM CO2STREAM /" if beta_rate_mt_yr > 0 else ""
     beta_wconinje = f"INJ2 GAS OPEN RATE {round(beta_rate)} 1* 285 /" if beta_rate_mt_yr > 0 else ""
-    # Storage Zeta is anchored to browser cell 682, which maps to I=42, J=30.
-    zeta_welspec = "INJ3 'STORAGE' 42 30 1* GAS /" if zeta_rate_mt_yr > 0 else ""
-    zeta_compdat = f"INJ3 42 30 1 {nz} OPEN 2* 0.3 /" if zeta_rate_mt_yr > 0 else ""
+    # Storage Zeta is anchored to browser cell 192, which maps to I=43, J=9.
+    zeta_welspec = "INJ3 'STORAGE' 43 9 1* GAS /" if zeta_rate_mt_yr > 0 else ""
+    zeta_compdat = f"INJ3 43 9 1 {nz} OPEN 2* 0.3 /" if zeta_rate_mt_yr > 0 else ""
     zeta_winjgas = "INJ3 STREAM CO2STREAM /" if zeta_rate_mt_yr > 0 else ""
     zeta_wconinje = f"INJ3 GAS OPEN RATE {round(zeta_rate)} 1* 285 /" if zeta_rate_mt_yr > 0 else ""
     return TEMPLATE.format(
@@ -261,7 +261,7 @@ def main() -> None:
     parser.add_argument("--fault-state", choices=("open", "semi-open", "closed"), default="open")
     parser.add_argument("--second-site", action="store_true", help="Enable Storage Beta south of the modelled fault")
     parser.add_argument("--beta-rate", type=float, default=0.0, help="Storage Beta rate (Mt CO2/year)")
-    parser.add_argument("--zeta-rate", type=float, default=0.0, help="Storage Zeta rate (Mt CO2/year at cell 682)")
+    parser.add_argument("--zeta-rate", type=float, default=0.0, help="Storage Zeta rate (Mt CO2/year at cell 192)")
     parser.add_argument("--output", type=Path, default=Path("runs/GASSUM_BASE.DATA"))
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
