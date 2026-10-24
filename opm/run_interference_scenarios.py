@@ -1,4 +1,4 @@
-"""Run OPM ensembles for two-site interference and three fault states."""
+"""Run OPM unit-response ensembles for three sites and the full fault set."""
 
 from __future__ import annotations
 
@@ -20,11 +20,13 @@ RUN_ROOT = HERE / "scenario-runs"
 FAULT_STATES = ("open", "semi-open", "closed")
 
 
-def run_case(index: int, properties: tuple[float, float, float], fault_state: str, second_site: bool) -> tuple[str, Path]:
+SITE_RESPONSES = ("alpha", "alpha_beta_unit", "alpha_zeta_unit")
+
+
+def run_case(index: int, properties: tuple[float, float, float], fault_state: str, site_response: str) -> tuple[str, Path]:
     permeability, porosity, thickness = properties
-    site_key = "alpha_beta" if second_site else "alpha"
-    scenario_key = f"{fault_state}_{site_key}"
-    case_name = f"GASSUM_{fault_state.replace('-', '_').upper()}_{site_key.upper()}_{index:02d}"
+    scenario_key = f"{fault_state}_{site_response}"
+    case_name = f"GASSUM_SET_{fault_state.replace('-', '_').upper()}_{site_response.upper()}_{index:02d}"
     case_dir = RUN_ROOT / case_name
     output_dir = case_dir / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -38,7 +40,8 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
             porosity,
             thickness,
             fault_state=fault_state,
-            second_site=second_site,
+            beta_rate_mt_yr=1.0 if site_response == "alpha_beta_unit" else 0.0,
+            zeta_rate_mt_yr=1.0 if site_response == "alpha_zeta_unit" else 0.0,
         ),
         encoding="utf-8",
     )
@@ -80,12 +83,12 @@ def main() -> None:
         raise SystemExit("OPM Flow is not on PATH; run inside Ubuntu WSL")
     RUN_ROOT.mkdir(parents=True, exist_ok=True)
     jobs = [
-        (index, properties, fault_state, second_site)
+        (index, properties, fault_state, site_response)
         for fault_state in FAULT_STATES
-        for second_site in (False, True)
+        for site_response in SITE_RESPONSES
         for index, properties in enumerate(CASES, start=1)
     ]
-    grouped: dict[str, list[Path]] = {f"{state}_{sites}": [] for state in FAULT_STATES for sites in ("alpha", "alpha_beta")}
+    grouped: dict[str, list[Path]] = {f"{state}_{response}": [] for state in FAULT_STATES for response in SITE_RESPONSES}
     with ThreadPoolExecutor(max_workers=3) as executor:
         futures = {executor.submit(run_case, *job): job for job in jobs}
         for number, future in enumerate(as_completed(futures), start=1):
@@ -128,15 +131,18 @@ def main() -> None:
     reservoir["storage_projects"] = [
         {"id": "alpha", "name": "Storage Alpha", "enabled": True, "rate_mt_yr": 1.0, **grid_location(30, 25)},
         {"id": "beta", "name": "Storage Beta", "enabled": False, "rate_mt_yr": 1.0, **grid_location(28, 20)},
+        {"id": "zeta", "name": "Storage Zeta", "enabled": False, "rate_mt_yr": 1.0, "cell_id": 682, **grid_location(42, 30)},
     ]
     reservoir["fault_scenarios"] = {
-        "modelled_fault_id": "polygon_23",
+        "modelled_fault_ids": [fault["id"] for fault in json.loads((HERE.parent / "dist" / "data" / "regional-context.json").read_text(encoding="utf-8"))["faults"]],
+        "fault_count": 29,
         "states": {"open": 1.0, "semi-open": 0.05, "closed": 0.0001},
-        "orientation": "vertical through all six Gassum layers",
+        "orientation": "all supplied traces represented vertically through all six Gassum layers",
+        "response_method": "unit-rate OPM responses superposed for 1, 2 and 3 Mt/yr screening",
     }
     reservoir["ensemble_size"] = len(CASES)
-    reservoir["ensemble_design"] = "L9 property ensemble for each site/fault configuration"
-    data["model_version"] = "decode-pressure-opm-interference-0.3.0"
+    reservoir["ensemble_design"] = "L9 property ensemble for each all-fault state and Alpha/Beta/Zeta unit response"
+    data["model_version"] = "decode-pressure-opm-all-faults-0.4.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

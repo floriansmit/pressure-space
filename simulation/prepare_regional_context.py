@@ -106,13 +106,13 @@ def main() -> None:
             "co2_storage_screen": "eligible only where top depth is at least 800 m" if any(eligible) else "not eligible",
         })
     payload = {
-        "model_version": "regional-context-0.1.0",
+        "model_version": "regional-context-0.2.0",
         "coordinate_source": "ED50 / UTM zone 32N supplied Petrel and EarthVision files",
         "bounds": bounds,
         "legacy_wells": read_wells(bounds, transformer),
         "faults": read_faults(bounds, transformer),
         "co2_depth_screen": depth_screen,
-        "fault_model_note": "Displayed traces are supplied fault sticks. OPM screening treats the selected central trace as a vertical transmissibility multiplier through all Gassum layers.",
+        "fault_model_note": "All displayed supplied fault traces are rasterized as one vertical transmissibility set through all six Gassum layers.",
     }
     OUTPUT.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
     print(f"wrote {len(payload['legacy_wells'])} wells and {len(payload['faults'])} fault traces to {OUTPUT}")
