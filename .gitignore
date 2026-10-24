@@ -1,4 +1,5 @@
 opm/runs/output/
 opm/ensemble-runs/
+opm/scenario-runs/
 __pycache__/
 *.pyc

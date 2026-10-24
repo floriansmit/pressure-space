@@ -31,7 +31,7 @@ EQLDIMS
 REGDIMS
 10 1 0 1 0 /
 WELLDIMS
-4 30 1 1 /
+4 30 1 2 /
 GASWAT
 UNIFOUT
 UNIFIN
@@ -59,6 +59,7 @@ PORV 1000000 1 1 1 {ny} 1 {nz} /
 PORV 1000000 {nx} {nx} 1 {ny} 1 {nz} /
 PORV 1000000 1 {nx} 1 1 1 {nz} /
 PORV 1000000 1 {nx} {ny} {ny} 1 {nz} /
+{fault_multiply}
 /
 
 PROPS
@@ -93,7 +94,7 @@ SOLUTION
 EQUIL
 {top_depth_m} {initial_pressure_bar} {datum_depth_m} 0 {datum_depth_m} 0 /
 RPTRST
-'BASIC=2' 'ALLPROPS' /
+'BASIC=2' 'PRES' 'SGAS' /
 
 SUMMARY
 ALL
@@ -104,21 +105,25 @@ WGIR
 
 SCHEDULE
 RPTRST
-'BASIC=2' 'ALLPROPS' /
+'BASIC=2' 'PRES' 'SGAS' /
 WELLSTRE
 'CO2STREAM' 1.0 0.0 /
 /
 WELSPECS
 INJ1 'STORAGE' {well_i} {well_j} 1* GAS /
+{beta_welspec}
 /
 COMPDAT
 INJ1 {well_i} {well_j} 1 {nz} OPEN 2* 0.3 /
+{beta_compdat}
 /
 WINJGAS
 INJ1 STREAM CO2STREAM /
+{beta_winjgas}
 /
 WCONINJE
 INJ1 GAS OPEN RATE {surface_rate_sm3_day} 1* {max_bhp_bar} /
+{beta_wconinje}
 /
 TSTEP
 {tsteps} /
@@ -133,6 +138,8 @@ def build_deck(
     permeability_md: float = 250.0,
     porosity: float = 0.22,
     thickness_m: float = 72.0,
+    fault_state: str = "open",
+    second_site: bool = False,
 ) -> str:
     nx, ny, nz = 60, 50, 6
     layer_thickness_m = thickness_m / nz
@@ -140,6 +147,15 @@ def build_deck(
     # OPM's CO2 surface-volume convention depends on the selected PVT model.
     # This MVP conversion is a documented scenario parameter, not a mass audit.
     surface_rate = rate_mt_yr * 1.0e9 / 1.87 / 365.25
+    fault_multiplier = {"open": 1.0, "semi-open": 0.05, "closed": 0.0001}[fault_state]
+    # Polygon 23 is the supplied E-W trace nearest the reference injector. Its
+    # Gassum intersection maps to the J=23 interface over I=27..31. MULTY is
+    # applied through every layer, making the screening fault vertical.
+    fault_multiply = f"MULTY {fault_multiplier} 27 31 23 23 1 {nz} /"
+    beta_welspec = "INJ2 'STORAGE' 28 20 1* GAS /" if second_site else ""
+    beta_compdat = f"INJ2 28 20 1 {nz} OPEN 2* 0.3 /" if second_site else ""
+    beta_winjgas = "INJ2 STREAM CO2STREAM /" if second_site else ""
+    beta_wconinje = f"INJ2 GAS OPEN RATE {round(surface_rate)} 1* 285 /" if second_site else ""
     return TEMPLATE.format(
         case_name=case_name.upper(), nx=nx, ny=ny, nz=nz, nxy=nx * ny,
         top_depth_m=top_depth_m, bottom_depth_m=top_depth_m + nz * layer_thickness_m,
@@ -149,6 +165,11 @@ def build_deck(
         rock_compressibility_bar_inv="5e-05", temperature_c=65,
         initial_pressure_bar=180, well_i=nx // 2, well_j=ny // 2,
         surface_rate_sm3_day=round(surface_rate), max_bhp_bar=285,
+        fault_multiply=fault_multiply,
+        beta_welspec=beta_welspec,
+        beta_compdat=beta_compdat,
+        beta_winjgas=beta_winjgas,
+        beta_wconinje=beta_wconinje,
         # Annual report steps are sufficient for the explorer and make ensemble
         # runs dramatically smaller than the initial monthly validation case.
         tsteps=f"{years}*365",
@@ -163,6 +184,8 @@ def main() -> None:
     parser.add_argument("--permeability", type=float, default=250.0, help="Horizontal permeability (mD)")
     parser.add_argument("--porosity", type=float, default=0.22)
     parser.add_argument("--thickness", type=float, default=72.0, help="Total aquifer thickness (m)")
+    parser.add_argument("--fault-state", choices=("open", "semi-open", "closed"), default="open")
+    parser.add_argument("--second-site", action="store_true", help="Enable Storage Beta south of the modelled fault")
     parser.add_argument("--output", type=Path, default=Path("runs/GASSUM_BASE.DATA"))
     args = parser.parse_args()
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -174,6 +197,8 @@ def main() -> None:
             permeability_md=args.permeability,
             porosity=args.porosity,
             thickness_m=args.thickness,
+            fault_state=args.fault_state,
+            second_site=args.second_site,
         ),
         encoding="utf-8",
     )

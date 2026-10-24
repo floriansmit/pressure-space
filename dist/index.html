@@ -19,6 +19,7 @@
       <section><p class="eyebrow">Regional scenario</p><h2>Pressure space</h2><p class="panel-intro">Explore pressure interference between CO₂ storage and geothermal operations. Gassum uses an OPM Flow screening ensemble; other formations remain analytical proxies.</p></section>
 
       <label class="field-label">Reservoir<select id="reservoirSelect" class="field-select"></select></label>
+      <p id="depthScreen" class="depth-screen">Checking the 800 m supercritical CO₂ depth screen…</p>
 
       <section class="project-card">
         <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Alpha</strong><small>Illustrative injection project</small></div><span class="status-badge">ACTIVE</span></div>
@@ -26,10 +27,30 @@
         <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><input id="durationInput" type="range" min="1" max="40" step="1" value="20"></label>
       </section>
 
+      <section class="project-card beta-card">
+        <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Beta</strong><small>1.0 Mt/yr · opposite fault block</small></div><label class="toggle"><input id="betaToggle" type="checkbox"><span></span></label></div>
+        <div class="project-status"><span>Pressure-interference scenario</span><strong id="betaStatus">OFF</strong></div>
+      </section>
+
+      <label class="field-label">Gassum fault transmissibility
+        <select id="faultState" class="field-select"><option value="open">Open · 100%</option><option value="semi-open" selected>Semi-open · 5%</option><option value="closed">Closed · 0.01%</option></select>
+        <small id="faultCaption" class="field-help">Supplied Polygon 23, represented vertically through the six Gassum layers.</small>
+      </label>
+
       <section class="time-controls">
         <div class="section-heading"><div><p class="eyebrow">Timeline</p><strong>Displayed state</strong></div><output id="yearOutput">Year 12</output></div>
         <input id="yearInput" type="range" min="1" max="60" step="1" value="12">
         <div class="time-scale"><span>Start</span><span>Injection stops</span><span>Post-injection</span></div>
+      </section>
+
+      <section>
+        <p class="eyebrow">Underlying geology</p>
+        <div class="layer-list" role="group" aria-label="Geology layer">
+          <button class="layer-button" data-layer="depth"><i class="depth-swatch"></i><span><strong>Reservoir depth</strong><small>Top surface · m TVDSS</small></span></button>
+          <button class="layer-button" data-layer="thickness"><i class="thickness-swatch"></i><span><strong>Net thickness</strong><small>Reservoir interval · m</small></span></button>
+          <button class="layer-button" data-layer="permeability"><i class="perm-swatch"></i><span><strong>Permeability</strong><small>Regional model · mD</small></span></button>
+          <button class="layer-button" data-layer="porosity"><i class="poro-swatch"></i><span><strong>Porosity</strong><small>Regional model · fraction</small></span></button>
+        </div>
       </section>
 
       <section>
@@ -45,6 +66,8 @@
       <section>
         <p class="eyebrow">Reference map</p>
         <button id="basemapToggle" class="basemap-button active" type="button" aria-pressed="true"><i aria-hidden="true">⌘</i><span><strong>OpenStreetMap basemap</strong><small id="basemapStatus">Visible · roads and places</small></span></button>
+        <button id="wellsToggle" class="basemap-button active" type="button" aria-pressed="true"><i aria-hidden="true">●</i><span><strong>Legacy wells</strong><small id="wellsStatus">Visible · supplied well files</small></span></button>
+        <button id="faultsToggle" class="basemap-button active" type="button" aria-pressed="true"><i aria-hidden="true">╱</i><span><strong>Supplied faults</strong><small id="faultsStatus">Visible · 29 mapped traces</small></span></button>
       </section>
 
       <label class="field-label">Pressure constraint<span class="field-with-unit"><input id="limitInput" type="number" value="25" min="1" max="100" step="1"><small>bar Δp</small></span></label>
@@ -61,8 +84,9 @@
         <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
         <div id="osmAttribution" class="osm-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">Report map issue</a></div>
         <div class="map-search"><span aria-hidden="true">⌖</span><input id="searchInput" type="search" placeholder="Find project or reservoir cell" aria-label="Find project or reservoir cell"><button id="fitButton">Fit model</button></div>
+        <div class="map-controls"><button id="zoomIn" type="button" aria-label="Zoom in">+</button><button id="zoomOut" type="button" aria-label="Zoom out">−</button><output id="zoomReadout">100%</output></div>
         <div class="map-legend"><div><span id="legendLow">0</span><strong id="legendUnit">Δp · bar</strong><span id="legendHigh">25</span></div><i id="legendRamp"></i><small id="legendCaption">P50 analytical ensemble</small></div>
-        <div class="map-key"><span><i class="storage-dot"></i>CO₂ storage</span><span><i class="geothermal-dot"></i>Geothermal</span><span><i class="fault-line"></i>Illustrative fault</span></div>
+        <div class="map-key"><span><i class="storage-dot"></i>CO₂ storage</span><span><i class="geothermal-dot"></i>Geothermal</span><span><i class="well-dot"></i>Legacy well</span><span><i class="fault-line"></i>Supplied fault</span></div>
         <div id="mapTooltip" class="map-tooltip" hidden></div>
       </div>
     </main>
@@ -96,8 +120,9 @@
   <dialog id="aboutDialog">
     <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
     <p class="eyebrow">Scientific boundary</p><h2>What this MVP can and cannot answer</h2>
-    <p>The Gassum view now uses nine successful OPM Flow 2026.04 <code>CO2STORE</code> simulations. Its P10/P50/P90 fields span low, central, and high permeability, porosity, and net-thickness cases. The CO₂ plume layer is read directly from simulated gas saturation.</p>
-    <p>This remains a generic regional screening model, not a history-matched or permitting model. Other formations still use the analytical proxy. Decisions require calibrated geology and fluids, fault transmissibilities, coupled geomechanics, operational well constraints, monitoring data, and review by qualified reservoir and geomechanics specialists.</p>
+    <p>The Gassum view uses 54 successful OPM Flow 2026.04 <code>CO2STORE</code> simulations: nine property realizations, three fault transmissibilities, and both single- and dual-project cases. Pressure and CO₂ saturation are read from those simulations.</p>
+    <p>Storage Alpha and Beta are transparent screening placements on opposing sides of supplied fault Polygon 23; they are not optimized or permit-ready well locations. Frederikshavn is only marginally below the 800 m screen at its shallowest model cell, so the map shows a caution rather than treating all of it as automatically suitable.</p>
+    <p>This remains a generic regional screening model, not a history-matched or permitting model. Decisions require calibrated geology and fluids, fault properties, coupled geomechanics, operational constraints, monitoring data, and qualified reservoir and geomechanics review.</p>
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
   </dialog>
 
