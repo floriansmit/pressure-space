@@ -87,8 +87,13 @@ def nearest_grid_cell(lon: float, lat: float, geology: dict) -> tuple[int, int]:
 def project_cells(geology: dict) -> dict[str, tuple[int, int]]:
     data = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
     reservoir = next(item for item in data["reservoirs"] if item["id"] == "gassum")
-    return {project["id"]: nearest_grid_cell(project["lon"], project["lat"], geology)
-            for project in reservoir["storage_projects"]}
+    projects = reservoir.get("storage_projects")
+    if projects:
+        return {project["id"]: nearest_grid_cell(project["lon"], project["lat"], geology)
+                for project in projects}
+    # Stable screening placements used when a freshly generated analytical base
+    # dataset has not yet been enriched with the OPM scenario metadata.
+    return {"alpha": (21, 14), "beta": (19, 11), "zeta": (30, 5)}
 
 
 def _grid_bounds() -> tuple[float, float, float, float]:

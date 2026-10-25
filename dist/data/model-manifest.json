@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "model_id": "pressure-space-gassum-screening",
-  "model_version": "pressure-space-opm-geological-0.8.1",
+  "model_version": "pressure-space-opm-geological-0.9.0",
   "simulator": {"name": "OPM Flow", "version": "2026.04", "mode": "CO2STORE", "components": ["CO2", "H2O"]},
   "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
   "grid": {
@@ -17,10 +17,13 @@
     "inactive_rule": "gross thickness below 5 m; resampling-edge property gaps use the nearest valid 500 m geological cell"
   },
   "property_model": {
-    "source": "gassum__pythermogis_input.nc on the DECODE 500 m EPSG:23032 grid",
-    "sampling": "linear interpolation to the 2 km EarthVision architecture nodes",
-    "horizontal_permeability_md_active_range": [8.443, 396.443],
-    "porosity_active_range": [0.10573, 0.20754],
+    "source": "Supplied Gassum well PHIE, Vshale and PERM_GEUS curves plus the DECODE 500 m NTG model",
+    "sampling": "porosity depth trend evaluated at mapped mid-reservoir TVDSS; porosity-permeability transform evaluated per 2 km cell; NTG linearly sampled to the EarthVision nodes",
+    "reservoir_sample_rule": "Top Gassum to Top Vinding samples with Vshale <= 0.40",
+    "porosity_depth_trend": {"equation": "phi = 0.38608518 - 0.0000796026 * mid_depth_m_tvdss", "method": "Theil-Sen robust fit", "well_count": 5, "limits": [0.12, 0.3]},
+    "porosity_permeability_transform": {"equation": "k_md = 10 ** (-0.24105203 + 11.54564195 * phi)", "paired_sample_count": 1072, "limits_md": [10, 2000]},
+    "horizontal_permeability_md_active_range": [109.851, 1669.708],
+    "porosity_active_range": [0.19755, 0.3],
     "net_to_gross_active_range": [0.36462, 0.5607],
     "vertical_to_horizontal_permeability_ratio": 0.1,
     "rock_compressibility_bar_inverse": 0.00005,
@@ -81,6 +84,7 @@
   ],
   "artifacts": {
     "geological_grid": "../../opm/data/gassum-geological-grid.json",
+    "petrophysics_calibration": "../../opm/data/gassum-petrophysics-calibration.json",
     "geological_exporter": "../../opm/export_geological_grid.py",
     "reference_deck": "../model/GASSUM_REFERENCE.DATA",
     "technical_assumptions": "../model/MODEL_ASSUMPTIONS.md",

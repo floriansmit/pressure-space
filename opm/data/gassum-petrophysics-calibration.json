@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0.0",
+  "formation": "Gassum Formation",
+  "source": "Supplied Petrel formation tops and LAS PHIE, Vshale and PERM_GEUS curves",
+  "reservoir_sample_rule": "Gassum interval samples with Vshale <= 0.40; PHIE 0.02-0.45",
+  "depth_reference": "mid-reservoir TVDSS below mean sea level",
+  "well_observations": [
+    {
+      "well": "Gassum-1",
+      "mid_reservoir_depth_m_tvdss": 1524.89,
+      "sand_porosity_median": 0.2647,
+      "sand_porosity_samples": 416,
+      "sand_permeability_geomean_md": 448.074,
+      "paired_porosity_permeability_samples": 416
+    },
+    {
+      "well": "Hobro-1",
+      "mid_reservoir_depth_m_tvdss": 2416.1,
+      "sand_porosity_median": 0.20126,
+      "sand_porosity_samples": 618
+    },
+    {
+      "well": "Hyllebjerg-1",
+      "mid_reservoir_depth_m_tvdss": 2638.5,
+      "sand_porosity_median": 0.17026,
+      "sand_porosity_samples": 930
+    },
+    {
+      "well": "Kvols-1",
+      "mid_reservoir_depth_m_tvdss": 2459.3,
+      "sand_porosity_median": 0.19518,
+      "sand_porosity_samples": 325,
+      "sand_permeability_geomean_md": 89.726,
+      "paired_porosity_permeability_samples": 325
+    },
+    {
+      "well": "Voldum-1",
+      "mid_reservoir_depth_m_tvdss": 1786.3,
+      "sand_porosity_median": 0.10665,
+      "sand_porosity_samples": 331,
+      "sand_permeability_geomean_md": 8.36,
+      "paired_porosity_permeability_samples": 331
+    }
+  ],
+  "porosity_depth_trend": {
+    "method": "Theil-Sen robust linear fit to well median sand porosity",
+    "equation": "phi = intercept + slope_per_m * mid_reservoir_depth_m_tvdss",
+    "slope_per_m": -7.96026e-05,
+    "intercept": 0.38608518,
+    "rmse_fraction": 0.06156,
+    "output_limits_fraction": [
+      0.12,
+      0.3
+    ]
+  },
+  "porosity_permeability_transform": {
+    "method": "ordinary least squares on paired sand-sample PHIE and log10(PERM_GEUS)",
+    "equation": "permeability_md = 10 ** (intercept + slope_times_phi * phi)",
+    "slope_times_phi": 11.54564195,
+    "intercept": -0.24105203,
+    "rmse_log10_md": 0.25492,
+    "sample_count": 1072,
+    "output_limits_md": [
+      10.0,
+      2000.0
+    ]
+  },
+  "limitations": [
+    "PERM_GEUS is a supplied log-derived permeability curve, not a new core calibration.",
+    "The depth trend is regional and does not resolve local facies or diagenetic changes.",
+    "The Voldum-1 low-porosity observation is retained; the robust fit limits its leverage."
+  ]
+}

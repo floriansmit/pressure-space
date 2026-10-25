@@ -15,10 +15,11 @@ permitting model.
 - The Gassum view uses 81 completed OPM Flow 2026.04 `CO2STORE` runs: nine
   property realizations, three all-fault transmissibility states, and unit-rate
   responses for Storage Alpha, Beta, and Zeta over a 20-year injection period.
-- The OPM grid uses the DECODE EarthVision Top Gassum and Top Vinding surfaces,
-  plus spatial porosity, permeability and net-to-gross sampled from the 500 m
-  Gassum property model. The ensemble perturbs those mapped values rather than
-  replacing them with homogeneous rock properties.
+- The OPM grid uses the DECODE EarthVision Top Gassum and Top Vinding surfaces.
+  Gassum sand porosity is calculated from a robust depth trend fitted to the
+  supplied wells at mid-reservoir TVDSS; permeability is calculated from 1,072
+  paired PHIE–PERM_GEUS sand samples. Net-to-gross remains spatially sampled
+  from the 500 m property model.
 - Shared-node `COORD`/`ZCORN` corner-point geometry keeps neighbouring cells
   hydraulically connected across mapped structural relief and avoids artificial
   stair-step pressure channels.
@@ -57,6 +58,7 @@ are published with the site:
 - [`dist/data/model-manifest.json`](dist/data/model-manifest.json) — machine-readable parameters and limitations;
 - [`dist/model/GASSUM_REFERENCE.DATA`](dist/model/GASSUM_REFERENCE.DATA) — generated reference OPM deck; and
 - [`opm/data/gassum-geological-grid.json`](opm/data/gassum-geological-grid.json) — compact mapped grid input; and
+- [`opm/data/gassum-petrophysics-calibration.json`](opm/data/gassum-petrophysics-calibration.json) — well observations, fitted depth trend and porosity–permeability transform;
 - [`opm/`](opm/) — geological exporter, deck generator and ensemble runners.
 
 The disclosure distinguishes the user-configured pressure screening limit from
@@ -66,6 +68,14 @@ Generate the browser dataset:
 
 ```powershell
 uv run python simulation/generate_ensemble.py
+```
+
+Rebuild the Gassum petrophysical calibration and OPM grid from the parent
+DECODE workspace:
+
+```powershell
+uv run python opm/calibrate_gassum_petrophysics.py
+uv run python opm/export_geological_grid.py
 ```
 
 Generate an individual OPM deck:

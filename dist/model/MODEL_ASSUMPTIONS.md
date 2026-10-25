@@ -24,13 +24,14 @@ approval or permitting.
   used by the explorer, so the simulation and map share the same locations.
 
 The compact input is stored in `opm/data/gassum-geological-grid.json`. The
-exporter `opm/export_geological_grid.py` derives it from the EarthVision
-architecture and the 500 m `gassum__pythermogis_input.nc` property model.
+exporter `opm/export_geological_grid.py` combines the EarthVision architecture,
+the well-calibrated Gassum sand trend and the 500 m net-to-gross, temperature
+and thickness-uncertainty fields.
 
 ## Rock and fluid inputs
 
-- Spatial porosity: approximately 0.106–0.208 in active cells.
-- Spatial horizontal permeability: approximately 8.4–396 mD in active cells.
+- Spatial porosity: approximately 0.198–0.300 in active cells.
+- Spatial horizontal permeability: approximately 110–1,670 mD in active cells.
 - Spatial net-to-gross: approximately 0.365–0.561.
 - Vertical permeability: 10% of local horizontal permeability.
 - Rock compressibility: 5×10^-5 bar^-1 at a 200 bar reference pressure.
@@ -40,6 +41,33 @@ architecture and the 500 m `gassum__pythermogis_input.nc` property model.
   thermal-flow simulation.
 - Relative-permeability and capillary-pressure tables are included verbatim in
   the downloadable reference deck.
+
+### Gassum petrophysical calibration
+
+The OPM cells represent the sand-rich reservoir fraction, so the calibration
+uses supplied LAS samples within the Top Gassum–Top Vinding interval for which
+`Vshale <= 0.40`. It does not use the median of the complete sand-plus-shale
+interval. Five wells provide sand porosity medians: Gassum-1 (0.265 at 1,525 m
+mid-reservoir TVDSS), Hobro-1 (0.201 at 2,416 m), Hyllebjerg-1 (0.170 at
+2,639 m), Kvols-1 (0.195 at 2,459 m), and Voldum-1 (0.107 at 1,786 m).
+
+A robust Theil-Sen trend limits the leverage of the anomalously low Voldum-1
+value while retaining it in the evidence:
+
+`porosity = 0.38608518 - 0.0000796026 × mid-reservoir depth (m TVDSS)`
+
+Values are constrained to 0.12–0.30 outside the calibration support. Each grid
+column uses its mapped mid-reservoir depth, calculated halfway between Top
+Gassum and Top Vinding. Horizontal permeability is then calculated from 1,072
+paired sand-sample PHIE and supplied `PERM_GEUS` observations:
+
+`permeability (mD) = 10 ^ (-0.24105203 + 11.54564195 × porosity)`
+
+`PERM_GEUS` is log-derived rather than a new core calibration. The trend is
+therefore more representative of the supplied sand observations but still does
+not resolve local facies or diagenetic variation. The complete observations,
+fit diagnostics and limits are in
+`opm/data/gassum-petrophysics-calibration.json`.
 
 ## Boundary conditions
 

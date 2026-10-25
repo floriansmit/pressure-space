@@ -137,7 +137,7 @@ def main() -> None:
         reservoir.setdefault("ensemble_size", data.get("ensemble_size", 160))
     map_to_points(data, pressure_cases, saturation_cases)
     data.update({
-        "model_version": "pressure-space-opm-geological-0.8.1",
+        "model_version": "pressure-space-opm-geological-0.9.0",
         "engine": "mixed OPM Flow and analytical screening ensembles",
         "opm_engine": "OPM Flow 2026.04 CO2STORE",
         "reference_rate_mt_yr": 1.0,

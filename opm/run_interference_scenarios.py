@@ -120,6 +120,14 @@ def main() -> None:
     for point in points:
         grid_i, grid_j = nearest_grid_cell(point["lon"], point["lat"], GEOLOGY)
         i, j = grid_i - 1, grid_j - 1
+        grid_index = j * NX + i
+        point.update({
+            "depth_m": GEOLOGY["top_depth_m"][grid_index],
+            "thickness_m": GEOLOGY["gross_thickness_m"][grid_index],
+            "mid_reservoir_depth_m": GEOLOGY["mid_reservoir_depth_m"][grid_index],
+            "porosity": GEOLOGY["porosity"][grid_index],
+            "permeability_md": GEOLOGY["permeability_md"][grid_index],
+        })
         point["scenario_pressure_bar"] = {
             scenario: quantiles(values[0], j, i) for scenario, values in arrays.items()
         }
@@ -151,14 +159,17 @@ def main() -> None:
         "response_method": "unit-rate OPM responses superposed for 1, 2 and 3 Mt/yr screening",
     }
     reservoir["ensemble_size"] = len(CASES)
+    reservoir["engine"] = "OPM Flow 2026.04 CO2STORE"
+    reservoir["is_opm_result"] = True
     reservoir["ensemble_design"] = "L9 perturbations around mapped geology for each all-fault state and Alpha/Beta/Zeta unit response"
     reservoir["geological_model"] = {
         "geometry": GEOLOGY["source"]["geometry"],
         "properties": ["porosity", "permeability", "net-to-gross", "gross thickness"],
         "surface_cells": NX * NY,
         "active_surface_cells": sum(GEOLOGY["active"]),
+        "petrophysics_method": GEOLOGY["source"]["property_method"],
     }
-    data["model_version"] = "pressure-space-opm-geological-0.8.1"
+    data["model_version"] = "pressure-space-opm-geological-0.9.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 
