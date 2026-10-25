@@ -61,7 +61,7 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
     return duration, scenario_key, output_dir / f"{case_name}.UNRST"
 
 
-def extract(path: Path) -> tuple[np.ndarray, np.ndarray]:
+def extract(path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     restart = ERst(str(path))
     active = np.asarray(GEOLOGY["active"] * NZ, dtype=bool).reshape(NZ, NY, NX)
 
@@ -74,13 +74,26 @@ def extract(path: Path) -> tuple[np.ndarray, np.ndarray]:
         return result
 
     initial = expand(restart["PRESSURE", 0])
-    pressure, saturation = [], []
+    pressure, saturation, pressure_layers, saturation_layers = [], [], [], []
     for year in YEARS:
         current = expand(restart["PRESSURE", year])
         gas = expand(restart["SGAS", year])
-        pressure.append(np.maximum(current - initial, 0).mean(axis=0))
+        delta = np.maximum(current - initial, 0)
+        pressure.append(delta.mean(axis=0))
         saturation.append(gas.max(axis=0) * 100)
-    return np.stack(pressure), np.stack(saturation)
+        pressure_layers.append(delta)
+        saturation_layers.append(gas * 100)
+    return np.stack(pressure), np.stack(saturation), np.stack(pressure_layers), np.stack(saturation_layers)
+
+
+def write_section_pack(path: Path, pressure: np.ndarray, saturation: np.ndarray) -> None:
+    """Write time × percentile × layer × row × column arrays for lazy browser loading."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pressure_q = np.quantile(pressure, (0.1, 0.5, 0.9), axis=0).transpose(1, 0, 2, 3, 4)
+    saturation_q = np.quantile(saturation, (0.1, 0.5, 0.9), axis=0).transpose(1, 0, 2, 3, 4)
+    with path.open("wb") as stream:
+        stream.write(np.asarray(pressure_q, dtype="<f4").tobytes(order="C"))
+        stream.write(np.clip(np.rint(saturation_q * 255 / 100), 0, 255).astype(np.uint8).tobytes(order="C"))
 
 
 def quantiles(values: np.ndarray, j: int, i: int) -> list[list[float]]:
@@ -121,7 +134,27 @@ def main() -> None:
             arrays[duration][scenario] = (
                 np.stack([item[0] for item in extracted]),
                 np.stack([item[1] for item in extracted]),
+                np.stack([item[2] for item in extracted]),
+                np.stack([item[3] for item in extracted]),
             )
+
+    section_dir = SITE_DATA.parent / "section"
+    manifest = {
+        "version": "0.12.0",
+        "shape": [len(YEARS), 3, NZ, NY, NX],
+        "times_years": list(YEARS),
+        "percentiles": [10, 50, 90],
+        "pressure_dtype": "float32-le",
+        "saturation_dtype": "uint8",
+        "saturation_scale": 100 / 255,
+        "files": {},
+    }
+    for duration, scenarios in arrays.items():
+        for scenario, values in scenarios.items():
+            filename = f"d{duration}-{scenario}.bin"
+            write_section_pack(section_dir / filename, values[2], values[3])
+            manifest["files"][f"{duration}:{scenario}"] = f"section/{filename}"
+    (SITE_DATA.parent / "section-manifest.json").write_text(json.dumps(manifest, separators=(",", ":")), encoding="utf-8")
 
     data = json.loads(SITE_DATA.read_text(encoding="utf-8"))
     data["times_years"] = list(YEARS)
@@ -133,6 +166,8 @@ def main() -> None:
         i, j = grid_i - 1, grid_j - 1
         grid_index = j * NX + i
         point.update({
+            "grid_i": i,
+            "grid_j": j,
             "depth_m": GEOLOGY["top_depth_m"][grid_index],
             "thickness_m": GEOLOGY["gross_thickness_m"][grid_index],
             "mid_reservoir_depth_m": GEOLOGY["mid_reservoir_depth_m"][grid_index],
@@ -192,7 +227,7 @@ def main() -> None:
             "90": {"permeability_multiplier": 2.0138, "porosity_multiplier": 1.1, "thickness_sigma_offset": 1.0},
         },
     }
-    data["model_version"] = "pressure-space-opm-geological-0.11.0"
+    data["model_version"] = "pressure-space-opm-geological-0.12.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

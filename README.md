@@ -39,6 +39,13 @@ permitting model.
   explorer controls: orbit/scroll navigation, zoom buttons, top and reset
   camera presets, selectable surface/fault/well layers, vertical exaggeration,
   labelled well paths, and click-to-inspect cells.
+- An optional A–A′ cross section opens beneath the map. It samples the actual
+  six-layer structural grid and lazy-loads layer-resolved OPM pressure and gas
+  saturation for the active duration, fault state and project combination.
+  Fault intersections, nearby legacy wells and storage locations are shown in
+  the section, and users can replace the default line with two map clicks.
+- The year control includes Play/Pause and 0.5×, 1×, 2× and 4× speeds; map,
+  section, plume and selected-cell metrics remain synchronized during playback.
 - All 29 supplied faults are represented together as vertical Gassum baffles.
   Every trace receives the selected open (1.0), semi-open (0.05), or closed
   (0.0001) transmissibility multiplier.

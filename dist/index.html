@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.8.1">
+  <link rel="stylesheet" href="styles.css?v=0.12.0">
 </head>
 <body>
   <div class="app-shell">
@@ -47,6 +47,7 @@
       <section class="time-controls">
         <div class="section-heading"><div><p class="eyebrow">Timeline</p><strong>Displayed state</strong></div><output id="yearOutput">Year 12</output></div>
         <input id="yearInput" type="range" min="1" max="60" step="1" value="12">
+        <div class="playback-controls"><button id="playButton" type="button" aria-label="Play timeline">▶ Play</button><label>Speed<select id="playSpeed"><option value="2000">0.5×</option><option value="1000" selected>1×</option><option value="500">2×</option><option value="250">4×</option></select></label></div>
         <div class="time-scale"><span>Start</span><span>Injection stops</span><span>Post-injection</span></div>
       </section>
 
@@ -85,7 +86,7 @@
     <main class="map-panel">
       <div class="map-heading">
         <div><p id="reservoirSubtitle">Regional aquifer</p><h2 id="mapTitle">Pressure change · Year 12</h2></div>
-        <div class="map-heading-actions"><div class="view-toggle" role="group" aria-label="Map view"><button id="view2d" class="active">2D</button><button id="view3d">3D</button></div><div class="percentiles" role="group" aria-label="Geology and result percentile" title="Geological layers show marginal property percentiles; result layers show cell-wise OPM output quantiles"><button data-p="10">P10</button><button data-p="50" class="active">P50</button><button data-p="90">P90</button></div></div>
+        <div class="map-heading-actions"><button id="sectionToggle" class="section-toggle" type="button" aria-expanded="false">▰ Section</button><div class="view-toggle" role="group" aria-label="Map view"><button id="view2d" class="active">2D</button><button id="view3d">3D</button></div><div class="percentiles" role="group" aria-label="Geology and result percentile" title="Geological layers show marginal property percentiles; result layers show cell-wise OPM output quantiles"><button data-p="10">P10</button><button data-p="50" class="active">P50</button><button data-p="90">P90</button></div></div>
       </div>
       <div class="map-canvas">
         <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
@@ -111,6 +112,11 @@
         <div class="map-key"><span><i class="storage-dot"></i>CO₂ storage</span><span><i class="geothermal-dot"></i>Geothermal</span><span><i class="well-dot"></i>Legacy well</span><span><i class="fault-line"></i>Supplied fault</span></div>
         <div id="mapTooltip" class="map-tooltip" hidden></div>
       </div>
+      <section id="sectionPanel" class="cross-section" hidden>
+        <header><div><p class="eyebrow">A–A′ synchronized section</p><strong id="sectionTitle">Gassum Formation · Year 12 · P50</strong></div><div class="section-actions"><span id="sectionStatus">Loading layer data…</span><button id="drawSection" type="button">Draw A–A′</button><button id="closeSection" type="button" aria-label="Close cross section">×</button></div></header>
+        <canvas id="sectionCanvas" role="img" aria-label="Cross section through the six-layer reservoir model"></canvas>
+        <div id="sectionTooltip" class="section-tooltip" hidden></div>
+      </section>
     </main>
 
     <aside class="detail-panel">
@@ -177,7 +183,7 @@
       <section><p class="eyebrow">Operations</p><dl>
         <div><dt>Simulator</dt><dd>OPM Flow 2026.04 · CO2STORE</dd></div>
         <div><dt>Components</dt><dd>CO₂ + H₂O</dd></div>
-        <div><dt>Injection period</dt><dd>20 years · annual reports</dd></div>
+        <div><dt>Injection period</dt><dd>5 / 10 / 20 / 30 / 40 years · shut-in to year 60</dd></div>
         <div><dt>Maximum BHP</dt><dd>285 bar</dd></div>
         <div><dt>Completions</dt><dd>All six layers</dd></div>
         <div><dt>Reference rate</dt><dd>1 Mt/yr unit responses</dd></div>
@@ -203,6 +209,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.11.0"></script>
+  <script src="app.js?v=0.12.0"></script>
 </body>
 </html>

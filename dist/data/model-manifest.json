@@ -1,7 +1,7 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "model_id": "pressure-space-gassum-screening",
-  "model_version": "pressure-space-opm-geological-0.11.0",
+  "model_version": "pressure-space-opm-geological-0.12.0",
   "simulator": {"name": "OPM Flow", "version": "2026.04", "mode": "CO2STORE", "components": ["CO2", "H2O"]},
   "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
   "grid": {
@@ -82,6 +82,7 @@
     "published_quantiles": [0.1, 0.5, 0.9]
   },
   "browser_combination_method": "Alpha is scaled by its selected rate. Beta and Zeta use the incremental difference between their two-well unit response and Alpha-only response, scaled linearly by selected rate.",
+  "cross_section_export": {"format": "lazy binary packs", "shape": [13, 3, 6, 28, 41], "fields": ["pressure_change_bar", "gas_saturation_percent"], "pack_count": 45, "manifest": "section-manifest.json", "section_rule": "A user-defined A–A′ trace samples the nearest OPM columns and displays all six structural layers."},
   "percentile_semantics": "Geological layers show marginal property percentiles from the L9 input levels. Pressure and saturation layers show cell-wise output quantiles across all nine realizations. A displayed geological P10 map is therefore not asserted to be the unique realization producing pressure P10 at every cell.",
   "limitations": [
     "The geological architecture and regional petrophysical fields are represented, but facies-scale heterogeneity and history matching are not.",
