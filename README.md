@@ -1,6 +1,14 @@
-# DECODE Pressure Space
+# PressureSpace
 
-Separate MVP for regional pressure management across CO2 storage and geothermal operations.
+Interactive regional pressure-management screening for CO2 storage and
+geothermal operations, backed by OPM Flow ensemble simulations.
+
+**Live application:** https://floriansmit.github.io/pressure-space/
+
+PressureSpace explores how injection projects, geothermal operations, and fault
+transmissibility interact across a shared pressure system. It is designed as a
+screening and scenario-comparison tool rather than a calibrated engineering or
+permitting model.
 
 ## What runs today
 
@@ -34,13 +42,13 @@ Separate MVP for regional pressure management across CO2 storage and geothermal 
 Generate the browser dataset:
 
 ```powershell
-uv run python sites/decode-pressure/simulation/generate_ensemble.py
+uv run python simulation/generate_ensemble.py
 ```
 
 Generate an individual OPM deck:
 
 ```powershell
-uv run python sites/decode-pressure/opm/build_deck.py --rate 1.2 --years 20
+uv run python opm/build_deck.py --rate 1.2 --years 20
 ```
 
 Run and merge the fault/interference OPM ensemble from Ubuntu WSL:
@@ -49,6 +57,24 @@ Run and merge the fault/interference OPM ensemble from Ubuntu WSL:
 cd /mnt/c/GGS/decode-3d/sites/decode-pressure/opm
 python3 run_interference_scenarios.py
 ```
+
+## Run locally
+
+From the repository root:
+
+```powershell
+node scripts/serve-preview.mjs 4176
+```
+
+Then open http://127.0.0.1:4176/.
+
+## GitHub Pages
+
+Pushes to `main` automatically publish the contents of `dist/` through the
+GitHub Actions workflow in `.github/workflows/pages.yml`.
+
+- Repository: https://github.com/floriansmit/pressure-space
+- Published site: https://floriansmit.github.io/pressure-space/
 
 ## OPM runtime on Windows
 
