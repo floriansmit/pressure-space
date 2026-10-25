@@ -1,11 +1,11 @@
 {
   "schema_version": "1.1.0",
   "model_id": "pressure-space-gassum-screening",
-  "model_version": "pressure-space-opm-geological-0.8.0",
+  "model_version": "pressure-space-opm-geological-0.8.1",
   "simulator": {"name": "OPM Flow", "version": "2026.04", "mode": "CO2STORE", "components": ["CO2", "H2O"]},
   "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
   "grid": {
-    "type": "Cartesian with spatially variable top and thickness",
+    "type": "continuous corner-point grid with spatially variable top and thickness",
     "dimensions": {"nx": 41, "ny": 28, "nz": 6, "surface_cells": 1148, "active_cells": 6816},
     "cell_size_m": {"dx": 2000, "dy": 2000},
     "top_geometry": "DECODE EarthVision Top Gassum horizon",
@@ -13,6 +13,7 @@
     "active_top_depth_m_range": [947.5, 2341.0],
     "gross_thickness_m_range": [10.5, 224.4],
     "vertical_layers": "six equal subdivisions of each column's mapped gross interval",
+    "corner_geometry": "Cell-centre horizons are averaged to shared nodes; COORD/ZCORN faces are continuous between adjacent cells.",
     "inactive_rule": "gross thickness below 5 m; resampling-edge property gaps use the nearest valid 500 m geological cell"
   },
   "property_model": {

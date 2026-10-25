@@ -19,6 +19,9 @@ permitting model.
   plus spatial porosity, permeability and net-to-gross sampled from the 500 m
   Gassum property model. The ensemble perturbs those mapped values rather than
   replacing them with homogeneous rock properties.
+- Shared-node `COORD`/`ZCORN` corner-point geometry keeps neighbouring cells
+  hydraulically connected across mapped structural relief and avoids artificial
+  stair-step pressure channels.
 - The interface reads simulated cell pressure and `SGAS` directly from OPM
   restart files and exposes pressure P10/P50/P90 plus a CO2 plume layer.
 - The map includes wheel/button zoom, drag pan, OpenStreetMap, four geological

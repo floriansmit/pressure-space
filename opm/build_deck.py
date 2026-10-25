@@ -27,6 +27,55 @@ def layer_values(surface_values: list[float] | list[int], nz: int) -> list[float
     return surface_values * nz
 
 
+def cell_centres_to_nodes(values: list[float], nx: int, ny: int) -> list[float]:
+    """Average cell-centre values onto shared corner-point grid nodes."""
+    nodes: list[float] = []
+    for node_j in range(ny + 1):
+        for node_i in range(nx + 1):
+            neighbours = []
+            for cell_j in (node_j - 1, node_j):
+                for cell_i in (node_i - 1, node_i):
+                    if 0 <= cell_i < nx and 0 <= cell_j < ny:
+                        neighbours.append(values[cell_j * nx + cell_i])
+            nodes.append(sum(neighbours) / len(neighbours))
+    return nodes
+
+
+def corner_point_geometry(
+    top: list[float], gross: list[float], nx: int, ny: int, nz: int, dx: float, dy: float,
+) -> tuple[list[float], list[float]]:
+    """Build continuous vertical pillars and shared ZCORN faces.
+
+    Cell-centre horizons are averaged to nodes. Adjacent cells therefore use
+    identical corner depths on their common face, avoiding artificial gaps in
+    steeply dipping parts of the mapped structure.
+    """
+    base = [top_depth + thickness for top_depth, thickness in zip(top, gross)]
+    top_nodes = cell_centres_to_nodes(top, nx, ny)
+    base_nodes = cell_centres_to_nodes(base, nx, ny)
+    coord: list[float] = []
+    pillar_top = min(top_nodes) - 500.0
+    pillar_base = max(base_nodes) + 500.0
+    for j in range(ny + 1):
+        for i in range(nx + 1):
+            x, y = i * dx, j * dy
+            coord.extend((x, y, pillar_top, x, y, pillar_base))
+
+    def boundary(fraction: float) -> list[float]:
+        return [a + (b - a) * fraction for a, b in zip(top_nodes, base_nodes)]
+
+    zcorn: list[float] = []
+    node_width = nx + 1
+    for k in range(nz):
+        for surface in (boundary(k / nz), boundary((k + 1) / nz)):
+            for j in range(ny):
+                for node_j in (j, j + 1):
+                    row = node_j * node_width
+                    for i in range(nx):
+                        zcorn.extend((surface[row + i], surface[row + i + 1]))
+    return coord, zcorn
+
+
 def nearest_grid_cell(lon: float, lat: float, geology: dict) -> tuple[int, int]:
     index = min(
         range(len(geology["longitude"])),
@@ -103,7 +152,9 @@ def build_deck(
     top = geology["top_depth_m"]
     gross = [max(5.0, value + thickness_sigma * sd)
              for value, sd in zip(geology["gross_thickness_m"], geology["thickness_sd_m"])]
-    dz = [value / nz for value in gross]
+    coord, zcorn = corner_point_geometry(
+        top, gross, nx, ny, nz, geology["dx_m"], geology["dy_m"],
+    )
     permx = [max(0.01, value * permeability_multiplier) for value in geology["permeability_md"]]
     permz = [value * 0.1 for value in permx]
     porosity = [min(0.4, max(0.03, value * porosity_multiplier)) for value in geology["porosity"]]
@@ -159,14 +210,10 @@ UNIFIN
 
 GRID
 INIT
-TOPS
-{keyword_values(top)} /
-DXV
-{nx}*{geology['dx_m']} /
-DYV
-{ny}*{geology['dy_m']} /
-DZ
-{keyword_values(layer_values(dz, nz))} /
+COORD
+{keyword_values(coord)} /
+ZCORN
+{keyword_values(zcorn)} /
 ACTNUM
 {keyword_values(layer_values(active, nz))} /
 PORO

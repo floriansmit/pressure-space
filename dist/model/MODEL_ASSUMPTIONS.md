@@ -8,12 +8,16 @@ approval or permitting.
 ## Geological grid
 
 - OPM Flow 2026.04 in `CO2STORE` mode with CO2 and H2O components.
-- Cartesian grid: 41 × 28 × 6, with 1,148 surface cells and 6,816 active cells.
+- Continuous corner-point grid: 41 × 28 × 6, with 1,148 surface cells and
+  6,816 active cells.
 - Horizontal cell dimensions: 2,000 × 2,000 m.
 - The top of every column is the DECODE EarthVision Top Gassum horizon. Active
   top depths range from approximately 948 to 2,341 m below MSL.
 - Gross thickness is the mapped interval from Top Gassum to Top Vinding, up to
   approximately 224 m. Each column is divided into six equal-thickness layers.
+- Cell-centre horizons are averaged to shared structural nodes and written as
+  `COORD`/`ZCORN`. Adjacent columns therefore share the same face geometry;
+  steep structure does not create artificial gaps between Cartesian columns.
 - Twelve columns thinner than 5 m are inactive. Small property gaps introduced
   at resampling edges are filled from the nearest valid 500 m geological cell.
 - Geometry and petrophysics are sampled onto the same 2 km architecture grid

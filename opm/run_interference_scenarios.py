@@ -158,7 +158,7 @@ def main() -> None:
         "surface_cells": NX * NY,
         "active_surface_cells": sum(GEOLOGY["active"]),
     }
-    data["model_version"] = "pressure-space-opm-geological-0.8.0"
+    data["model_version"] = "pressure-space-opm-geological-0.8.1"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 
