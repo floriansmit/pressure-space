@@ -145,7 +145,7 @@ def main() -> None:
     map_to_points(data, pressure_cases, saturation_cases)
     next(item for item in data["reservoirs"] if item["id"] == "gassum")["times_years"] = list(YEARS)
     data.update({
-        "model_version": "pressure-space-opm-geological-0.10.0",
+        "model_version": "pressure-space-opm-geological-0.11.0",
         "engine": "mixed OPM Flow and analytical screening ensembles",
         "opm_engine": "OPM Flow 2026.04 CO2STORE",
         "reference_rate_mt_yr": 1.0,

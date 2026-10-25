@@ -151,6 +151,7 @@ def build_deck(
     second_site: bool = False,
     beta_rate_mt_yr: float = 0.0,
     zeta_rate_mt_yr: float = 0.0,
+    injection_years: int | None = None,
 ) -> str:
     geology = load_geology()
     nx, ny, nz = geology["nx"], geology["ny"], geology["nz"]
@@ -187,6 +188,22 @@ def build_deck(
     zeta_compdat = f"INJ3 {zeta_i} {zeta_j} 1 {nz} OPEN 2* 0.3 /" if zeta_rate_mt_yr > 0 else ""
     zeta_winjgas = "INJ3 STREAM CO2STREAM /" if zeta_rate_mt_yr > 0 else ""
     zeta_wconinje = f"INJ3 GAS OPEN RATE {round(zeta_rate)} 1* 285 /" if zeta_rate_mt_yr > 0 else ""
+    injection_years = years if injection_years is None else injection_years
+    if not 1 <= injection_years <= years:
+        raise ValueError("injection_years must be between 1 and the simulation length")
+    shut_lines = ["INJ1 GAS SHUT RATE 0 1* 285 /"]
+    if beta_rate_mt_yr > 0:
+        shut_lines.append("INJ2 GAS SHUT RATE 0 1* 285 /")
+    if zeta_rate_mt_yr > 0:
+        shut_lines.append("INJ3 GAS SHUT RATE 0 1* 285 /")
+    shut_schedule = ""
+    if injection_years < years:
+        shut_schedule = f"""WCONINJE
+{chr(10).join(shut_lines)}
+/
+TSTEP
+{years - injection_years}*365 /
+"""
 
     return f"""-- PressureSpace geological Gassum regional screening model
 -- EarthVision structure and spatial petrophysics; not calibrated for permitting.
@@ -309,7 +326,8 @@ INJ1 GAS OPEN RATE {round(surface_rate)} 1* 285 /
 {zeta_wconinje}
 /
 TSTEP
-{years}*365 /
+{injection_years}*365 /
+{shut_schedule}
 END
 """
 
@@ -319,6 +337,7 @@ def main() -> None:
     parser.add_argument("--case", default="gassum_geological")
     parser.add_argument("--rate", type=float, default=1.0, help="Mt CO2/year")
     parser.add_argument("--years", type=int, default=20)
+    parser.add_argument("--injection-years", type=int)
     parser.add_argument("--permeability-multiplier", type=float, default=1.0)
     parser.add_argument("--porosity-multiplier", type=float, default=1.0)
     parser.add_argument("--thickness-sigma", type=float, default=0.0)
@@ -334,6 +353,7 @@ def main() -> None:
             args.case, args.rate, args.years,
             args.permeability_multiplier, args.porosity_multiplier, args.thickness_sigma,
             args.fault_state, args.second_site, args.beta_rate, args.zeta_rate,
+            args.injection_years,
         ))
     print(args.output.resolve())
 

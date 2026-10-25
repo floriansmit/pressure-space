@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -16,17 +17,18 @@ from run_ensemble import CASES, GEOLOGY, NX, NY, NZ, SITE_DATA, YEARS
 
 
 HERE = Path(__file__).resolve().parent
-RUN_ROOT = HERE / "scenario-runs"
+RUN_ROOT = Path(os.environ.get("PRESSURE_SPACE_RUN_ROOT", HERE / "scenario-runs"))
 FAULT_STATES = ("open", "semi-open", "closed")
+DURATIONS = (5, 10, 20, 30, 40)
 
 
 SITE_RESPONSES = ("alpha", "alpha_beta_unit", "alpha_zeta_unit")
 
 
-def run_case(index: int, properties: tuple[float, float, float], fault_state: str, site_response: str) -> tuple[str, Path]:
+def run_case(index: int, properties: tuple[float, float, float], fault_state: str, site_response: str, duration: int) -> tuple[int, str, Path]:
     permeability, porosity, thickness = properties
     scenario_key = f"{fault_state}_{site_response}"
-    case_name = f"GASSUM_SET_{fault_state.replace('-', '_').upper()}_{site_response.upper()}_{index:02d}"
+    case_name = f"GASSUM_D{duration:02d}_{fault_state.replace('-', '_').upper()}_{site_response.upper()}_{index:02d}"
     case_dir = RUN_ROOT / case_name
     output_dir = case_dir / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -42,6 +44,7 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
             fault_state=fault_state,
             beta_rate_mt_yr=1.0 if site_response == "alpha_beta_unit" else 0.0,
             zeta_rate_mt_yr=1.0 if site_response == "alpha_zeta_unit" else 0.0,
+            injection_years=duration,
         ),
         encoding="utf-8",
     )
@@ -55,7 +58,7 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
         )
     if result.returncode:
         raise RuntimeError(f"{case_name} failed; see {log}")
-    return scenario_key, output_dir / f"{case_name}.UNRST"
+    return duration, scenario_key, output_dir / f"{case_name}.UNRST"
 
 
 def extract(path: Path) -> tuple[np.ndarray, np.ndarray]:
@@ -93,26 +96,32 @@ def main() -> None:
         raise SystemExit("OPM Flow is not on PATH; run inside Ubuntu WSL")
     RUN_ROOT.mkdir(parents=True, exist_ok=True)
     jobs = [
-        (index, properties, fault_state, site_response)
+        (index, properties, fault_state, site_response, duration)
         for fault_state in FAULT_STATES
         for site_response in SITE_RESPONSES
+        for duration in DURATIONS
         for index, properties in enumerate(CASES, start=1)
     ]
-    grouped: dict[str, list[Path]] = {f"{state}_{response}": [] for state in FAULT_STATES for response in SITE_RESPONSES}
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    grouped: dict[int, dict[str, list[Path]]] = {
+        duration: {f"{state}_{response}": [] for state in FAULT_STATES for response in SITE_RESPONSES}
+        for duration in DURATIONS
+    }
+    with ThreadPoolExecutor(max_workers=min(9, os.cpu_count() or 3)) as executor:
         futures = {executor.submit(run_case, *job): job for job in jobs}
         for number, future in enumerate(as_completed(futures), start=1):
-            scenario, path = future.result()
-            grouped[scenario].append(path)
-            print(f"completed {number}/{len(jobs)}: {scenario}", flush=True)
+            duration, scenario, path = future.result()
+            grouped[duration][scenario].append(path)
+            print(f"completed {number}/{len(jobs)}: {duration} yr · {scenario}", flush=True)
 
     arrays = {}
-    for scenario, paths in grouped.items():
-        extracted = [extract(path) for path in sorted(paths)]
-        arrays[scenario] = (
-            np.stack([item[0] for item in extracted]),
-            np.stack([item[1] for item in extracted]),
-        )
+    for duration, scenarios in grouped.items():
+        arrays[duration] = {}
+        for scenario, paths in scenarios.items():
+            extracted = [extract(path) for path in sorted(paths)]
+            arrays[duration][scenario] = (
+                np.stack([item[0] for item in extracted]),
+                np.stack([item[1] for item in extracted]),
+            )
 
     data = json.loads(SITE_DATA.read_text(encoding="utf-8"))
     data["times_years"] = list(YEARS)
@@ -131,12 +140,16 @@ def main() -> None:
             "permeability_md": GEOLOGY["permeability_md"][grid_index],
             "thickness_sd_m": GEOLOGY["thickness_sd_m"][grid_index],
         })
-        point["scenario_pressure_bar"] = {
-            scenario: quantiles(values[0], j, i) for scenario, values in arrays.items()
+        point["scenario_pressure_bar_by_duration"] = {
+            str(duration): {scenario: quantiles(values[0], j, i) for scenario, values in scenarios.items()}
+            for duration, scenarios in arrays.items()
         }
-        point["scenario_co2_saturation"] = {
-            scenario: quantiles(values[1], j, i) for scenario, values in arrays.items()
+        point["scenario_co2_saturation_by_duration"] = {
+            str(duration): {scenario: quantiles(values[1], j, i) for scenario, values in scenarios.items()}
+            for duration, scenarios in arrays.items()
         }
+        point["scenario_pressure_bar"] = point["scenario_pressure_bar_by_duration"]["20"]
+        point["scenario_co2_saturation"] = point["scenario_co2_saturation_by_duration"]["20"]
         point["pressure_bar"] = point["scenario_pressure_bar"]["open_alpha"]
         point["co2_saturation"] = point["scenario_co2_saturation"]["open_alpha"]
 
@@ -162,6 +175,8 @@ def main() -> None:
         "response_method": "unit-rate OPM responses superposed for 1, 2 and 3 Mt/yr screening",
     }
     reservoir["ensemble_size"] = len(CASES)
+    reservoir["schedule_count"] = len(FAULT_STATES) * len(SITE_RESPONSES) * len(DURATIONS)
+    reservoir["injection_durations_years"] = list(DURATIONS)
     reservoir["engine"] = "OPM Flow 2026.04 CO2STORE"
     reservoir["is_opm_result"] = True
     reservoir["ensemble_design"] = "L9 perturbations around mapped geology for each all-fault state and Alpha/Beta/Zeta unit response"
@@ -177,7 +192,7 @@ def main() -> None:
             "90": {"permeability_multiplier": 2.0138, "porosity_multiplier": 1.1, "thickness_sigma_offset": 1.0},
         },
     }
-    data["model_version"] = "pressure-space-opm-geological-0.10.0"
+    data["model_version"] = "pressure-space-opm-geological-0.11.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

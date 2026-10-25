@@ -127,25 +127,23 @@ These are scenario multipliers, not measured fault transmissibilities.
 - Maximum bottom-hole pressure: 285 bar.
 - Unit-response rate: 1 Mt CO2/year.
 - Rate conversion assumes 1.87 kg/Sm3, giving 1,464,091 Sm3/day per Mt/year.
-- Simulation begins 1 January 2027. The unit-response cases inject continuously
-  to year 60, with published response years 1, 5, 10, 15, 20, 25, 30, 35,
-  40, 45, 50, 55 and 60.
+- Simulation begins 1 January 2027. Separate cases inject for 5, 10, 20, 30
+  or 40 years, shut in all active injectors, and continue through year 60.
+  Published response years are 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50,
+  55 and 60.
 - The browser linearly interpolates between published OPM response years.
-- For a selected finite injection duration, pressure after shut-in is calculated
-  by subtracting a time-shifted unit response. This is an OPM-derived linear
-  response approximation, not a separately run shut-in schedule for every
-  possible duration.
-- CO2 saturation is held at the selected stop year. Post-injection plume
-  migration is not represented by this screening dataset.
+- Both pressure and SGAS are read from the explicit schedule selected in the
+  interface, including the post-injection period. Durations between the five
+  simulated schedules are intentionally unavailable rather than interpolated.
 
 ## Ensemble and browser calculations
 
-The published dataset contains 81 successful OPM simulations: nine geological
-property perturbations, three shared all-fault states, and three unit-response
-patterns (Alpha, Alpha plus Beta, and Alpha plus Zeta). P10, P50 and P90 are
-calculated across the nine realizations. The browser scales unit responses for
-the 1–3 Mt/year controls; this is linear superposition, not a fresh nonlinear
-OPM solve for every slider position.
+The published dataset contains 405 successful OPM simulations: nine geological
+property perturbations, three shared all-fault states, three unit-response
+patterns (Alpha, Alpha plus Beta, and Alpha plus Zeta), and five injection
+durations. P10, P50 and P90 are calculated across the nine realizations. The
+browser scales unit responses for the 1–3 Mt/year controls; this is linear
+superposition, not a fresh nonlinear OPM solve for every rate combination.
 
 ## Important exclusions
 

@@ -26,7 +26,7 @@
       <section class="project-card">
         <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Alpha</strong><small>Illustrative injection project</small></div><span class="status-badge">ACTIVE</span></div>
         <label class="range-field"><span>Injection rate <output id="rateOutput">1.2 Mt/yr</output></span><input id="rateInput" type="range" min="0.2" max="3" step="0.1" value="1.2"></label>
-        <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><input id="durationInput" type="range" min="1" max="40" step="1" value="20"></label>
+        <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><select id="durationInput" aria-label="OPM injection duration"><option value="5">5 years</option><option value="10">10 years</option><option value="20" selected>20 years</option><option value="30">30 years</option><option value="40">40 years</option></select></label>
       </section>
 
       <section class="project-card beta-card">
@@ -142,7 +142,7 @@
   <dialog id="aboutDialog">
     <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
     <p class="eyebrow">Scientific boundary</p><h2>What this MVP can and cannot answer</h2>
-    <p>The Gassum view uses 81 successful OPM Flow 2026.04 <code>CO2STORE</code> simulations: nine property realizations, three shared all-fault transmissibilities, and Alpha/Beta/Zeta unit responses. The 1–3 Mt/yr project controls use transparent unit-response superposition for regional screening.</p>
+    <p>The Gassum view uses 405 successful OPM Flow 2026.04 <code>CO2STORE</code> simulations: nine property realizations, three shared all-fault transmissibilities, Alpha/Beta/Zeta unit responses, and five explicit injection-and-shut-in schedules. The 1–3 Mt/yr project controls use transparent unit-response superposition for regional screening.</p>
     <p>All 29 supplied fault traces are represented as one vertical transmissibility set through the six Gassum layers. Storage Alpha, Beta and Zeta are screening placements rather than optimized or permit-ready well locations; Zeta is fixed at model Cell 192.</p>
     <p>The OPM ensemble uses the mapped Gassum–Vinding structure, a well-calibrated sand porosity depth trend, the observed porosity–permeability transform, and spatial net-to-gross. It remains a regional screening model rather than a history-matched or permitting model. Decisions require calibrated fluids, fault properties, coupled geomechanics, operational constraints, monitoring data, and qualified reservoir and geomechanics review.</p>
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
@@ -186,13 +186,13 @@
         <div><dt>Fault set</dt><dd>All 29 supplied traces</dd></div>
         <div><dt>Open / semi-open / closed</dt><dd>1.0 / 0.05 / 0.0001</dd></div>
         <div><dt>Property design</dt><dd>9-case L9 screening ensemble</dd></div>
-        <div><dt>OPM runs</dt><dd>9 × 3 fault states × 3 responses = 81</dd></div>
+        <div><dt>OPM runs</dt><dd>9 × 3 fault states × 3 responses × 5 durations = 405</dd></div>
         <div><dt>Published statistics</dt><dd>P10 / P50 / P90 · properties and results</dd></div>
         <div><dt>Multi-project method</dt><dd>Unit-response superposition</dd></div>
       </dl></section>
     </div>
 
-    <p class="assumption-note"><strong>Not represented:</strong> history matching, calibrated aquifer support, spatial facies in the OPM grid, coupled geomechanics, thermal coupling, stress-dependent fault behaviour, induced-seismicity probability, well injectivity calibration, or permit-ready operating limits. OPM unit responses now run to year 60. Finite injection durations and subsequent pressure dissipation are calculated from those responses by time-shifted superposition; post-injection plume migration remains outside this screening model.</p>
+    <p class="assumption-note"><strong>Not represented:</strong> history matching, calibrated aquifer support, spatial facies in the OPM grid, coupled geomechanics, thermal coupling, stress-dependent fault behaviour, induced-seismicity probability, well injectivity calibration, or permit-ready operating limits. Five explicit injection-and-shut-in schedules run through year 60, including post-injection pressure dissipation and CO₂ plume migration.</p>
     <div class="dialog-links">
       <a href="model/MODEL_ASSUMPTIONS.md" target="_blank">Technical assumptions</a>
       <a href="model/GASSUM_REFERENCE.DATA" download>Reference OPM deck</a>
@@ -203,6 +203,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.10.0"></script>
+  <script src="app.js?v=0.11.0"></script>
 </body>
 </html>
