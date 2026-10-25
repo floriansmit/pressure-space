@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.12.0">
+  <link rel="stylesheet" href="styles.css?v=0.12.1">
 </head>
 <body>
   <div class="app-shell">
@@ -26,7 +26,7 @@
       <section class="project-card">
         <div class="project-card-top"><span class="project-icon">CO₂</span><div><strong>Storage Alpha</strong><small>Illustrative injection project</small></div><span class="status-badge">ACTIVE</span></div>
         <label class="range-field"><span>Injection rate <output id="rateOutput">1.2 Mt/yr</output></span><input id="rateInput" type="range" min="0.2" max="3" step="0.1" value="1.2"></label>
-        <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><select id="durationInput" aria-label="OPM injection duration"><option value="5">5 years</option><option value="10">10 years</option><option value="20" selected>20 years</option><option value="30">30 years</option><option value="40">40 years</option></select></label>
+        <label class="range-field"><span>Operating duration <output id="durationOutput">20 yr</output></span><input id="durationInput" type="range" min="0" max="4" step="1" value="2" aria-label="OPM injection duration" aria-valuetext="20 years"><span class="duration-scale" aria-hidden="true"><small>5</small><small>10</small><small>20</small><small>30</small><small>40 yr</small></span></label>
       </section>
 
       <section class="project-card beta-card">
@@ -209,6 +209,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.12.0"></script>
+  <script src="app.js?v=0.12.1"></script>
 </body>
 </html>
