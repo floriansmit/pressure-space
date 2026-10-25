@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "model_id": "pressure-space-gassum-screening",
-  "model_version": "pressure-space-opm-geological-0.9.1",
+  "model_version": "pressure-space-opm-geological-0.10.0",
   "simulator": {"name": "OPM Flow", "version": "2026.04", "mode": "CO2STORE", "components": ["CO2", "H2O"]},
   "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
   "grid": {
@@ -67,7 +67,7 @@
       {"name": "Storage Zeta", "browser_cell": 192, "opm_i": 30, "opm_j": 5, "longitude": 10.231644, "latitude": 56.44953}
     ]
   },
-  "schedule": {"start_date": "2027-01-01", "injection_years": 20, "simulation_end_year": 20, "reporting": "annual", "published_years": [1, 5, 10, 20], "browser_after_year_20": "Final year-20 response is held constant."},
+  "schedule": {"start_date": "2027-01-01", "reference_response_injection_years": 60, "simulation_end_year": 60, "published_years": [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60], "browser_duration_range_years": [1, 40], "post_injection_pressure_method": "finite-duration response calculated by subtracting the time-shifted OPM unit step response", "co2_after_shut_in": "saturation at the selected injection stop is held as an occupancy proxy; post-injection plume migration is not simulated"},
   "ensemble": {
     "property_realizations": 9,
     "property_design": "L9 perturbations around every cell's mapped value",
@@ -87,7 +87,8 @@
     "No coupled geomechanics, thermal coupling, stress-dependent fault behaviour or induced-seismicity probability is simulated.",
     "The interface pressure constraint is user-configured and is not a calibrated fracture-pressure or fault-reactivation threshold.",
     "Multi-project controls use linear unit-response superposition rather than a new fully coupled OPM run.",
-    "The OPM schedule ends at year 20; later interface years hold the final simulated response."
+    "Finite-duration pressure decline uses linear, time-shifted superposition of the 60-year OPM unit response rather than a separately run shut-in schedule for every slider duration.",
+    "Post-injection CO2 saturation is held at the selected stop year; plume migration after shut-in is not simulated."
   ],
   "artifacts": {
     "geological_grid": "../../opm/data/gassum-geological-grid.json",

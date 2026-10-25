@@ -35,7 +35,7 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
         build_deck(
             case_name,
             1.0,
-            20,
+            max(YEARS),
             permeability,
             porosity,
             thickness,
@@ -115,7 +115,9 @@ def main() -> None:
         )
 
     data = json.loads(SITE_DATA.read_text(encoding="utf-8"))
+    data["times_years"] = list(YEARS)
     reservoir = next(item for item in data["reservoirs"] if item["id"] == "gassum")
+    reservoir["times_years"] = list(YEARS)
     points = reservoir["points"]
     for point in points:
         grid_i, grid_j = nearest_grid_cell(point["lon"], point["lat"], GEOLOGY)
@@ -175,7 +177,7 @@ def main() -> None:
             "90": {"permeability_multiplier": 2.0138, "porosity_multiplier": 1.1, "thickness_sigma_offset": 1.0},
         },
     }
-    data["model_version"] = "pressure-space-opm-geological-0.9.1"
+    data["model_version"] = "pressure-space-opm-geological-0.10.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

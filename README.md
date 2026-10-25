@@ -14,7 +14,7 @@ permitting model.
 
 - The Gassum view uses 81 completed OPM Flow 2026.04 `CO2STORE` runs: nine
   property realizations, three all-fault transmissibility states, and unit-rate
-  responses for Storage Alpha, Beta, and Zeta over a 20-year injection period.
+  responses for Storage Alpha, Beta, and Zeta through year 60.
 - The OPM grid uses the DECODE EarthVision Top Gassum and Top Vinding surfaces.
   Gassum sand porosity is calculated from a robust depth trend fitted to the
   supplied wells at mid-reservoir TVDSS; permeability is calculated from 1,072
@@ -25,6 +25,11 @@ permitting model.
   stair-step pressure channels.
 - The interface reads simulated cell pressure and `SGAS` directly from OPM
   restart files and exposes pressure P10/P50/P90 plus a CO2 plume layer.
+- Finite injection durations use time-shifted superposition of the 60-year OPM
+  unit pressure response, so the pressure maps and trajectory continue through
+  the post-injection period instead of holding the last year-20 result. The CO2
+  plume remains fixed after injection stops because post-injection plume
+  migration is not yet simulated.
 - The same selector exposes marginal P10/P50/P90 porosity, permeability and
   gross-thickness inputs. Geological properties retain a fixed P10–P90 colour
   scale while the percentile changes; mapped structural depth remains fixed.

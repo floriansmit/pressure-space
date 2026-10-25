@@ -25,7 +25,10 @@ SITE_DATA = HERE.parent / "dist" / "data" / "pressure-model.json"
 RUN_ROOT = HERE / "ensemble-runs"
 GEOLOGY = load_geology()
 NX, NY, NZ = GEOLOGY["nx"], GEOLOGY["ny"], GEOLOGY["nz"]
-YEARS = (1, 5, 10, 20)
+# Published response-function samples.  The reference cases inject continuously
+# for 60 years; the browser derives a finite injection period by subtracting a
+# time-shifted unit response after shut-in.
+YEARS = (1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60)
 
 # An L9 orthogonal design perturbs the mapped geological properties rather than
 # replacing them with homogeneous values. Permeability uses the supplied 0.7
@@ -44,7 +47,7 @@ def run_case(index: int, permeability: float, porosity: float, thickness: float)
     output_dir.mkdir(parents=True, exist_ok=True)
     deck = case_dir / f"{case_name}.DATA"
     deck.write_text(
-        build_deck(case_name, 1.0, 20, permeability, porosity, thickness),
+        build_deck(case_name, 1.0, max(YEARS), permeability, porosity, thickness),
         encoding="utf-8",
     )
     log = case_dir / "flow.log"
@@ -128,16 +131,21 @@ def main() -> None:
     saturation_cases = np.stack([item[1] for item in extracted])
 
     data = json.loads(SITE_DATA.read_text(encoding="utf-8"))
+    previous_times = list(data["times_years"])
     data["times_years"] = list(YEARS)
     for reservoir in data["reservoirs"]:
+        if reservoir["id"] != "gassum":
+            existing_length = len(reservoir["points"][0]["pressure_bar"])
+            reservoir.setdefault("times_years", previous_times[:existing_length])
         for point in reservoir["points"]:
             point["pressure_bar"] = point["pressure_bar"][: len(YEARS)]
         reservoir.setdefault("engine", "analytical radial-diffusivity ensemble")
         reservoir.setdefault("is_opm_result", False)
         reservoir.setdefault("ensemble_size", data.get("ensemble_size", 160))
     map_to_points(data, pressure_cases, saturation_cases)
+    next(item for item in data["reservoirs"] if item["id"] == "gassum")["times_years"] = list(YEARS)
     data.update({
-        "model_version": "pressure-space-opm-geological-0.9.1",
+        "model_version": "pressure-space-opm-geological-0.10.0",
         "engine": "mixed OPM Flow and analytical screening ensembles",
         "opm_engine": "OPM Flow 2026.04 CO2STORE",
         "reference_rate_mt_yr": 1.0,

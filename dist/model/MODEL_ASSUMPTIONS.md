@@ -127,11 +127,16 @@ These are scenario multipliers, not measured fault transmissibilities.
 - Maximum bottom-hole pressure: 285 bar.
 - Unit-response rate: 1 Mt CO2/year.
 - Rate conversion assumes 1.87 kg/Sm3, giving 1,464,091 Sm3/day per Mt/year.
-- Simulation begins 1 January 2027 and injects for 20 years with annual report
-  steps. Published response years are 1, 5, 10 and 20.
-
-The schedule ends at year 20. Browser years 21–60 hold the final year-20
-response and are not separately simulated post-injection states.
+- Simulation begins 1 January 2027. The unit-response cases inject continuously
+  to year 60, with published response years 1, 5, 10, 15, 20, 25, 30, 35,
+  40, 45, 50, 55 and 60.
+- The browser linearly interpolates between published OPM response years.
+- For a selected finite injection duration, pressure after shut-in is calculated
+  by subtracting a time-shifted unit response. This is an OPM-derived linear
+  response approximation, not a separately run shut-in schedule for every
+  possible duration.
+- CO2 saturation is held at the selected stop year. Post-injection plume
+  migration is not represented by this screening dataset.
 
 ## Ensemble and browser calculations
 
