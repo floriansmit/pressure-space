@@ -127,6 +127,7 @@ def main() -> None:
             "mid_reservoir_depth_m": GEOLOGY["mid_reservoir_depth_m"][grid_index],
             "porosity": GEOLOGY["porosity"][grid_index],
             "permeability_md": GEOLOGY["permeability_md"][grid_index],
+            "thickness_sd_m": GEOLOGY["thickness_sd_m"][grid_index],
         })
         point["scenario_pressure_bar"] = {
             scenario: quantiles(values[0], j, i) for scenario, values in arrays.items()
@@ -168,8 +169,13 @@ def main() -> None:
         "surface_cells": NX * NY,
         "active_surface_cells": sum(GEOLOGY["active"]),
         "petrophysics_method": GEOLOGY["source"]["property_method"],
+        "property_percentiles": {
+            "10": {"permeability_multiplier": 0.4966, "porosity_multiplier": 0.9, "thickness_sigma_offset": -1.0},
+            "50": {"permeability_multiplier": 1.0, "porosity_multiplier": 1.0, "thickness_sigma_offset": 0.0},
+            "90": {"permeability_multiplier": 2.0138, "porosity_multiplier": 1.1, "thickness_sigma_offset": 1.0},
+        },
     }
-    data["model_version"] = "pressure-space-opm-geological-0.9.0"
+    data["model_version"] = "pressure-space-opm-geological-0.9.1"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

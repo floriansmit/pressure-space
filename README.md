@@ -25,6 +25,9 @@ permitting model.
   stair-step pressure channels.
 - The interface reads simulated cell pressure and `SGAS` directly from OPM
   restart files and exposes pressure P10/P50/P90 plus a CO2 plume layer.
+- The same selector exposes marginal P10/P50/P90 porosity, permeability and
+  gross-thickness inputs. Geological properties retain a fixed P10–P90 colour
+  scale while the percentile changes; mapped structural depth remains fixed.
 - The map includes wheel/button zoom, drag pan, OpenStreetMap, four geological
   model properties, eight supplied legacy wells, 29 supplied fault traces, and
   a connected-surface 3D top-structure view. The 3D view follows the geothermal

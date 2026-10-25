@@ -85,7 +85,7 @@
     <main class="map-panel">
       <div class="map-heading">
         <div><p id="reservoirSubtitle">Regional aquifer</p><h2 id="mapTitle">Pressure change · Year 12</h2></div>
-        <div class="map-heading-actions"><div class="view-toggle" role="group" aria-label="Map view"><button id="view2d" class="active">2D</button><button id="view3d">3D</button></div><div class="percentiles" role="group" aria-label="Percentile"><button data-p="10">P10</button><button data-p="50" class="active">P50</button><button data-p="90">P90</button></div></div>
+        <div class="map-heading-actions"><div class="view-toggle" role="group" aria-label="Map view"><button id="view2d" class="active">2D</button><button id="view3d">3D</button></div><div class="percentiles" role="group" aria-label="Geology and result percentile" title="Geological layers show marginal property percentiles; result layers show cell-wise OPM output quantiles"><button data-p="10">P10</button><button data-p="50" class="active">P50</button><button data-p="90">P90</button></div></div>
       </div>
       <div class="map-canvas">
         <svg id="pressureMap" role="img" aria-label="Regional pressure map"></svg>
@@ -187,7 +187,7 @@
         <div><dt>Open / semi-open / closed</dt><dd>1.0 / 0.05 / 0.0001</dd></div>
         <div><dt>Property design</dt><dd>9-case L9 screening ensemble</dd></div>
         <div><dt>OPM runs</dt><dd>9 × 3 fault states × 3 responses = 81</dd></div>
-        <div><dt>Published statistics</dt><dd>P10 / P50 / P90</dd></div>
+        <div><dt>Published statistics</dt><dd>P10 / P50 / P90 · properties and results</dd></div>
         <div><dt>Multi-project method</dt><dd>Unit-response superposition</dd></div>
       </dl></section>
     </div>
@@ -203,6 +203,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.9.0"></script>
+  <script src="app.js?v=0.9.1"></script>
 </body>
 </html>

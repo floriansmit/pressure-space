@@ -89,6 +89,18 @@ design combines:
 These are screening perturbations around the geological model, not nine
 history-matched realizations.
 
+The P10/P50/P90 selector also changes the geological property maps. Porosity
+shows the 0.9/1.0/1.1 multiplier levels, permeability shows the
+0.4966/1.0/2.0138 levels, and gross thickness shows -1/0/+1 mapped standard
+deviation. Every property uses one fixed colour scale spanning its displayed
+P10–P90 range, so changes in colour represent actual changes in value rather
+than legend rescaling. Top depth remains fixed because structural uncertainty
+is not included.
+
+These property maps are marginal input percentiles. Pressure and gas saturation
+are cell-wise output quantiles across all nine L9 runs, so a P10 property map is
+not necessarily the single realization that produces pressure P10 everywhere.
+
 ## Fault representation
 
 All 29 supplied map traces are rasterized onto Cartesian `MULTX` and `MULTY`

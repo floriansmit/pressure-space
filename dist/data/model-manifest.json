@@ -1,7 +1,7 @@
 {
   "schema_version": "1.1.0",
   "model_id": "pressure-space-gassum-screening",
-  "model_version": "pressure-space-opm-geological-0.9.0",
+  "model_version": "pressure-space-opm-geological-0.9.1",
   "simulator": {"name": "OPM Flow", "version": "2026.04", "mode": "CO2STORE", "components": ["CO2", "H2O"]},
   "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
   "grid": {
@@ -22,6 +22,12 @@
     "reservoir_sample_rule": "Top Gassum to Top Vinding samples with Vshale <= 0.40",
     "porosity_depth_trend": {"equation": "phi = 0.38608518 - 0.0000796026 * mid_depth_m_tvdss", "method": "Theil-Sen robust fit", "well_count": 5, "limits": [0.12, 0.3]},
     "porosity_permeability_transform": {"equation": "k_md = 10 ** (-0.24105203 + 11.54564195 * phi)", "paired_sample_count": 1072, "limits_md": [10, 2000]},
+    "display_percentiles": {
+      "P10": {"permeability_multiplier": 0.4966, "porosity_multiplier": 0.9, "thickness_sigma_offset": -1},
+      "P50": {"permeability_multiplier": 1.0, "porosity_multiplier": 1.0, "thickness_sigma_offset": 0},
+      "P90": {"permeability_multiplier": 2.0138, "porosity_multiplier": 1.1, "thickness_sigma_offset": 1}
+    },
+    "display_colour_scale": "One fixed P10-P90 range per geological property and reservoir; it does not rescale when the selected percentile changes.",
     "horizontal_permeability_md_active_range": [109.851, 1669.708],
     "porosity_active_range": [0.19755, 0.3],
     "net_to_gross_active_range": [0.36462, 0.5607],
@@ -74,6 +80,7 @@
     "published_quantiles": [0.1, 0.5, 0.9]
   },
   "browser_combination_method": "Alpha is scaled by its selected rate. Beta and Zeta use the incremental difference between their two-well unit response and Alpha-only response, scaled linearly by selected rate.",
+  "percentile_semantics": "Geological layers show marginal property percentiles from the L9 input levels. Pressure and saturation layers show cell-wise output quantiles across all nine realizations. A displayed geological P10 map is therefore not asserted to be the unique realization producing pressure P10 at every cell.",
   "limitations": [
     "The geological architecture and regional petrophysical fields are represented, but facies-scale heterogeneity and history matching are not.",
     "The lateral boundary treatment is a screening approximation and has not been calibrated to regional aquifer support.",
