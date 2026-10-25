@@ -39,6 +39,20 @@ permitting model.
 - `opm/build_deck.py` generates a regional model with configurable rate,
   duration, permeability, porosity, and thickness.
 
+## Model transparency
+
+The application includes a **Model assumptions** panel with the inputs and
+boundary conditions used by the Gassum OPM ensemble. Reproducibility artifacts
+are published with the site:
+
+- [`dist/model/MODEL_ASSUMPTIONS.md`](dist/model/MODEL_ASSUMPTIONS.md) — readable technical disclosure;
+- [`dist/data/model-manifest.json`](dist/data/model-manifest.json) — machine-readable parameters and limitations;
+- [`dist/model/GASSUM_REFERENCE.DATA`](dist/model/GASSUM_REFERENCE.DATA) — generated reference OPM deck; and
+- [`opm/`](opm/) — deck generator and ensemble runners.
+
+The disclosure distinguishes the user-configured pressure screening limit from
+a calibrated geomechanical, fracture-pressure, or fault-reactivation limit.
+
 Generate the browser dataset:
 
 ```powershell

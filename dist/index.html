@@ -7,14 +7,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.6.0">
+  <link rel="stylesheet" href="styles.css?v=0.7.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <div class="brand-mark" aria-hidden="true">◆</div>
       <div class="brand"><h1>DECODE</h1><p>SUBSURFACE PRESSURE MANAGEMENT</p></div>
-      <div class="topbar-status"><span class="status-dot"></span><span id="engineLabel">Loading ensemble…</span><span class="topbar-divider"></span><button id="aboutButton" class="text-button">Model boundary</button></div>
+      <div class="topbar-status"><span class="status-dot"></span><span id="engineLabel">Loading ensemble…</span><span class="topbar-divider"></span><button id="modelAssumptionsButton" class="text-button">Model assumptions</button><span class="topbar-divider"></span><button id="aboutButton" class="text-button">Scientific boundary</button></div>
     </header>
 
     <aside class="control-panel">
@@ -148,6 +148,58 @@
     <button class="primary-button" onclick="document.getElementById('aboutDialog').close()">Understood</button>
   </dialog>
 
-  <script src="app.js?v=0.6.0"></script>
+  <dialog id="modelAssumptionsDialog" class="assumptions-dialog">
+    <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
+    <p class="eyebrow">OPM model disclosure</p><h2>Model assumptions &amp; provenance</h2>
+    <p class="dialog-lead">These are the actual inputs used for the published Gassum screening ensemble. Values are deliberately visible so results can be reproduced and challenged.</p>
+
+    <div class="assumption-warning"><strong>Screening model—not calibrated.</strong><span>The map’s geological surfaces provide regional context; the current OPM grid uses a flat, homogeneous 1,800 m top. The configured pressure limit is not a calibrated fracture or seismicity threshold.</span></div>
+
+    <div class="assumption-grid">
+      <section><p class="eyebrow">Grid &amp; boundaries</p><dl>
+        <div><dt>Grid</dt><dd>60 × 50 × 6 · 18,000 cells</dd></div>
+        <div><dt>Cell size</dt><dd>2,000 × 2,000 m</dd></div>
+        <div><dt>Reservoir top</dt><dd>1,800 m · flat</dd></div>
+        <div><dt>Total thickness</dt><dd>45 / 72 / 110 m ensemble</dd></div>
+        <div><dt>Lateral boundary</dt><dd>Each edge operation: pore volume × 1,000,000</dd></div>
+        <div><dt>Top and base</dt><dd>No-flow</dd></div>
+      </dl></section>
+      <section><p class="eyebrow">Rock &amp; fluids</p><dl>
+        <div><dt>Horizontal permeability</dt><dd>100 / 250 / 600 mD</dd></div>
+        <div><dt>Vertical permeability</dt><dd>0.1 × horizontal</dd></div>
+        <div><dt>Porosity</dt><dd>0.18 / 0.22 / 0.26</dd></div>
+        <div><dt>Rock compressibility</dt><dd>5×10⁻⁵ bar⁻¹</dd></div>
+        <div><dt>Temperature</dt><dd>65 °C</dd></div>
+        <div><dt>Initial pressure</dt><dd>180 bar at 1,800 m datum</dd></div>
+      </dl></section>
+      <section><p class="eyebrow">Operations</p><dl>
+        <div><dt>Simulator</dt><dd>OPM Flow 2026.04 · CO2STORE</dd></div>
+        <div><dt>Components</dt><dd>CO₂ + H₂O</dd></div>
+        <div><dt>Injection period</dt><dd>20 years · annual reports</dd></div>
+        <div><dt>Maximum BHP</dt><dd>285 bar</dd></div>
+        <div><dt>Completions</dt><dd>All six layers</dd></div>
+        <div><dt>Reference rate</dt><dd>1 Mt/yr unit responses</dd></div>
+      </dl></section>
+      <section><p class="eyebrow">Faults &amp; ensemble</p><dl>
+        <div><dt>Fault set</dt><dd>All 29 supplied traces</dd></div>
+        <div><dt>Open / semi-open / closed</dt><dd>1.0 / 0.05 / 0.0001</dd></div>
+        <div><dt>Property design</dt><dd>9-case L9 screening ensemble</dd></div>
+        <div><dt>OPM runs</dt><dd>9 × 3 fault states × 3 responses = 81</dd></div>
+        <div><dt>Published statistics</dt><dd>P10 / P50 / P90</dd></div>
+        <div><dt>Multi-project method</dt><dd>Unit-response superposition</dd></div>
+      </dl></section>
+    </div>
+
+    <p class="assumption-note"><strong>Not represented:</strong> history matching, calibrated aquifer support, spatial facies in the OPM grid, coupled geomechanics, thermal coupling, stress-dependent fault behaviour, induced-seismicity probability, well injectivity calibration, or permit-ready operating limits. The OPM schedule ends at year 20; later display years hold the final simulated response and are not post-injection dissipation simulations.</p>
+    <div class="dialog-links">
+      <a href="model/MODEL_ASSUMPTIONS.md" target="_blank">Technical assumptions</a>
+      <a href="model/GASSUM_REFERENCE.DATA" download>Reference OPM deck</a>
+      <a href="data/model-manifest.json" target="_blank">Machine-readable manifest</a>
+      <a href="https://github.com/floriansmit/pressure-space/tree/main/opm" target="_blank" rel="noreferrer">Simulation source</a>
+    </div>
+    <form method="dialog"><button class="primary-button">Close</button></form>
+  </dialog>
+
+  <script src="app.js?v=0.7.0"></script>
 </body>
 </html>

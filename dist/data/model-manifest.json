@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "pressure-space-gassum-screening",
+  "model_version": "decode-pressure-opm-all-faults-0.6.0",
+  "simulation_source_commit": "b2cc2a4",
+  "simulator": {
+    "name": "OPM Flow",
+    "version": "2026.04",
+    "mode": "CO2STORE",
+    "components": ["CO2", "H2O"]
+  },
+  "purpose": "Regional pressure-interference screening; not calibrated for engineering design, seismic-risk assessment or permitting.",
+  "grid": {
+    "type": "Cartesian",
+    "dimensions": {"nx": 60, "ny": 50, "nz": 6, "cells": 18000},
+    "cell_size_m": {"dx": 2000, "dy": 2000},
+    "top_depth_m": 1800,
+    "top_geometry": "flat",
+    "total_thickness_m_ensemble": [45, 72, 110],
+    "layer_thickness_rule": "total_thickness_m / 6"
+  },
+  "boundary_conditions": {
+    "lateral": "Four MULTIPLY operations apply a 1,000,000 pore-volume multiplier to the west, east, south and north edge-cell sets. Corner cells are included in two edge operations and therefore receive the multiplier twice. This is a large-volume pressure-sink approximation rather than an explicit aquifer or fixed-pressure boundary.",
+    "top": "no-flow",
+    "base": "no-flow"
+  },
+  "initial_conditions": {
+    "equil_datum_depth_m": 1800,
+    "datum_pressure_bar": 180,
+    "temperature_c": 65,
+    "equil_keyword": "EQUIL 1800 180 1600 0 1600 0 /"
+  },
+  "rock_properties": {
+    "horizontal_permeability_md": [100, 250, 600],
+    "vertical_to_horizontal_permeability_ratio": 0.1,
+    "porosity_fraction": [0.18, 0.22, 0.26],
+    "rock_compressibility_bar_inverse": 0.00005,
+    "rock_reference_pressure_bar": 200,
+    "property_distribution": "homogeneous within each realization"
+  },
+  "relative_permeability": {
+    "water_saturation_function": [[0.2, 0.0], [0.4, 0.1], [0.8, 0.5], [1.0, 1.0]],
+    "gas_saturation_function": [[0.0, 0.0, 0.0], [0.08, 0.001, 0.0], [0.17, 0.01, 0.0], [0.35, 0.05, 0.0], [0.53, 0.2, 0.0], [0.62, 0.35, 0.0], [0.71, 0.56, 0.0], [0.8, 1.0, 0.0]]
+  },
+  "faults": {
+    "count": 29,
+    "representation": "Supplied map traces rasterized to MULTX and MULTY faces and extended vertically through all six layers.",
+    "transmissibility_multipliers": {"open": 1.0, "semi_open": 0.05, "closed": 0.0001},
+    "shared_state_rule": "Every fault uses the same selected state in a scenario."
+  },
+  "wells": {
+    "completion_layers": [1, 2, 3, 4, 5, 6],
+    "maximum_bhp_bar": 285,
+    "reference_rate_mt_per_year": 1.0,
+    "rate_conversion": {"co2_density_kg_per_sm3": 1.87, "one_mt_per_year_sm3_per_day": 1464091},
+    "locations": [
+      {"name": "Storage Alpha", "opm_i": 30, "opm_j": 25},
+      {"name": "Storage Beta", "opm_i": 28, "opm_j": 20},
+      {"name": "Storage Zeta", "browser_cell": 192, "opm_i": 43, "opm_j": 9, "longitude": 10.231644, "latitude": 56.44953}
+    ]
+  },
+  "schedule": {"start_date": "2027-01-01", "injection_years": 20, "simulation_end_year": 20, "reporting": "annual", "published_years": [1, 5, 10, 20], "browser_after_year_20": "The final year-20 response is held constant; years 21-60 are not separately simulated post-injection states."},
+  "ensemble": {
+    "property_realizations": 9,
+    "property_design": "L9 screening design",
+    "fault_states": 3,
+    "unit_response_patterns": ["alpha", "alpha_plus_beta", "alpha_plus_zeta"],
+    "opm_runs": 81,
+    "published_quantiles": [0.1, 0.5, 0.9],
+    "realizations": [
+      {"permeability_md": 100, "porosity": 0.18, "thickness_m": 45},
+      {"permeability_md": 100, "porosity": 0.22, "thickness_m": 72},
+      {"permeability_md": 100, "porosity": 0.26, "thickness_m": 110},
+      {"permeability_md": 250, "porosity": 0.18, "thickness_m": 72},
+      {"permeability_md": 250, "porosity": 0.22, "thickness_m": 110},
+      {"permeability_md": 250, "porosity": 0.26, "thickness_m": 45},
+      {"permeability_md": 600, "porosity": 0.18, "thickness_m": 110},
+      {"permeability_md": 600, "porosity": 0.22, "thickness_m": 45},
+      {"permeability_md": 600, "porosity": 0.26, "thickness_m": 72}
+    ]
+  },
+  "browser_combination_method": "Alpha is scaled by its selected rate. Beta and Zeta use the incremental difference between their two-well unit response and the Alpha-only response, scaled linearly by the selected rate.",
+  "limitations": [
+    "The current OPM grid is flat and homogeneous within each realization; mapped geological surfaces and cell-scale properties are visual context only.",
+    "The lateral boundary treatment is a screening approximation and has not been calibrated to regional aquifer support.",
+    "No coupled geomechanics, thermal coupling, stress-dependent fault behaviour or induced-seismicity probability is simulated.",
+    "The interface pressure constraint is user-configured and is not a calibrated fracture-pressure or fault-reactivation threshold.",
+    "Multi-project controls use linear unit-response superposition rather than a new fully coupled OPM run.",
+    "The OPM schedule ends at year 20. Later interface years hold the final simulated response and do not represent modeled pressure dissipation."
+  ],
+  "artifacts": {
+    "reference_deck": "../model/GASSUM_REFERENCE.DATA",
+    "technical_assumptions": "../model/MODEL_ASSUMPTIONS.md",
+    "generator": "../../opm/build_deck.py",
+    "ensemble_runner": "../../opm/run_interference_scenarios.py"
+  }
+}
