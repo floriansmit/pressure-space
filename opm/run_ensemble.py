@@ -17,21 +17,23 @@ from pathlib import Path
 import numpy as np
 from opm.io.ecl import ERst
 
-from build_deck import build_deck
+from build_deck import build_deck, load_geology, nearest_grid_cell
 
 
 HERE = Path(__file__).resolve().parent
 SITE_DATA = HERE.parent / "dist" / "data" / "pressure-model.json"
 RUN_ROOT = HERE / "ensemble-runs"
-NX, NY, NZ = 60, 50, 6
+GEOLOGY = load_geology()
+NX, NY, NZ = GEOLOGY["nx"], GEOLOGY["ny"], GEOLOGY["nz"]
 YEARS = (1, 5, 10, 20)
 
-# An L9 orthogonal design spans low, central and high aquifer properties without
-# pretending that nine generic realizations constitute a calibrated uncertainty model.
+# An L9 orthogonal design perturbs the mapped geological properties rather than
+# replacing them with homogeneous values. Permeability uses the supplied 0.7
+# log-space uncertainty, porosity +/-10%, and thickness +/- one supplied SD.
 CASES = (
-    (100.0, 0.18, 45.0), (100.0, 0.22, 72.0), (100.0, 0.26, 110.0),
-    (250.0, 0.18, 72.0), (250.0, 0.22, 110.0), (250.0, 0.26, 45.0),
-    (600.0, 0.18, 110.0), (600.0, 0.22, 45.0), (600.0, 0.26, 72.0),
+    (0.4966, 0.9, -1.0), (0.4966, 1.0, 0.0), (0.4966, 1.1, 1.0),
+    (1.0, 0.9, 0.0), (1.0, 1.0, 1.0), (1.0, 1.1, -1.0),
+    (2.0138, 0.9, 1.0), (2.0138, 1.0, -1.0), (2.0138, 1.1, 0.0),
 )
 
 
@@ -60,12 +62,22 @@ def run_case(index: int, permeability: float, porosity: float, thickness: float)
 
 def extract_case(path: Path) -> tuple[np.ndarray, np.ndarray]:
     restart = ERst(str(path))
-    initial_pressure = np.asarray(restart["PRESSURE", 0], dtype=float).reshape(NZ, NY, NX)
+    active = np.asarray(GEOLOGY["active"] * NZ, dtype=bool).reshape(NZ, NY, NX)
+
+    def expand(values: np.ndarray) -> np.ndarray:
+        values = np.asarray(values, dtype=float)
+        if values.size == active.size:
+            return values.reshape(NZ, NY, NX)
+        result = np.zeros((NZ, NY, NX), dtype=float)
+        result[active] = values
+        return result
+
+    initial_pressure = expand(restart["PRESSURE", 0])
     pressure_results = []
     saturation_results = []
     for year in YEARS:
-        pressure = np.asarray(restart["PRESSURE", year], dtype=float).reshape(NZ, NY, NX)
-        saturation = np.asarray(restart["SGAS", year], dtype=float).reshape(NZ, NY, NX)
+        pressure = expand(restart["PRESSURE", year])
+        saturation = expand(restart["SGAS", year])
         pressure_results.append(np.maximum(pressure - initial_pressure, 0.0).mean(axis=0))
         saturation_results.append(saturation.max(axis=0))
     return np.stack(pressure_results), np.stack(saturation_results)
@@ -74,12 +86,9 @@ def extract_case(path: Path) -> tuple[np.ndarray, np.ndarray]:
 def map_to_points(data: dict, pressure_cases: np.ndarray, saturation_cases: np.ndarray) -> None:
     reservoir = next(item for item in data["reservoirs"] if item["id"] == "gassum")
     points = reservoir["points"]
-    lon_min, lon_max = min(p["lon"] for p in points), max(p["lon"] for p in points)
-    lat_min, lat_max = min(p["lat"] for p in points), max(p["lat"] for p in points)
-
     for point in points:
-        i = int(round((point["lon"] - lon_min) / (lon_max - lon_min) * (NX - 1)))
-        j = int(round((point["lat"] - lat_min) / (lat_max - lat_min) * (NY - 1)))
+        grid_i, grid_j = nearest_grid_cell(point["lon"], point["lat"], GEOLOGY)
+        i, j = grid_i - 1, grid_j - 1
         p_values = pressure_cases[:, :, j, i]
         s_values = saturation_cases[:, :, j, i]
         point["pressure_bar"] = [
@@ -91,16 +100,11 @@ def map_to_points(data: dict, pressure_cases: np.ndarray, saturation_cases: np.n
             for t in range(len(YEARS))
         ]
 
-    # The OPM injector is in the centre grid cell.
-    reservoir["reference_injector"] = {
-        "lon": round((lon_min + lon_max) / 2, 6),
-        "lat": round((lat_min + lat_max) / 2, 6),
-    }
     reservoir.update({
         "engine": "OPM Flow 2026.04 CO2STORE",
         "is_opm_result": True,
         "ensemble_size": len(CASES),
-        "ensemble_design": "L9 screening design over permeability, porosity and net thickness",
+        "ensemble_design": "L9 perturbations around mapped permeability, porosity and gross thickness",
     })
 
 
@@ -133,7 +137,7 @@ def main() -> None:
         reservoir.setdefault("ensemble_size", data.get("ensemble_size", 160))
     map_to_points(data, pressure_cases, saturation_cases)
     data.update({
-        "model_version": "decode-pressure-opm-mvp-0.2.0",
+        "model_version": "pressure-space-opm-geological-0.8.0",
         "engine": "mixed OPM Flow and analytical screening ensembles",
         "opm_engine": "OPM Flow 2026.04 CO2STORE",
         "reference_rate_mt_yr": 1.0,

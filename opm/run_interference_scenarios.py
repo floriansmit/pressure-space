@@ -11,8 +11,8 @@ from pathlib import Path
 import numpy as np
 from opm.io.ecl import ERst
 
-from build_deck import build_deck
-from run_ensemble import CASES, NX, NY, NZ, SITE_DATA, YEARS
+from build_deck import build_deck, nearest_grid_cell, project_cells
+from run_ensemble import CASES, GEOLOGY, NX, NY, NZ, SITE_DATA, YEARS
 
 
 HERE = Path(__file__).resolve().parent
@@ -60,11 +60,21 @@ def run_case(index: int, properties: tuple[float, float, float], fault_state: st
 
 def extract(path: Path) -> tuple[np.ndarray, np.ndarray]:
     restart = ERst(str(path))
-    initial = np.asarray(restart["PRESSURE", 0], dtype=float).reshape(NZ, NY, NX)
+    active = np.asarray(GEOLOGY["active"] * NZ, dtype=bool).reshape(NZ, NY, NX)
+
+    def expand(values: np.ndarray) -> np.ndarray:
+        values = np.asarray(values, dtype=float)
+        if values.size == active.size:
+            return values.reshape(NZ, NY, NX)
+        result = np.zeros((NZ, NY, NX), dtype=float)
+        result[active] = values
+        return result
+
+    initial = expand(restart["PRESSURE", 0])
     pressure, saturation = [], []
     for year in YEARS:
-        current = np.asarray(restart["PRESSURE", year], dtype=float).reshape(NZ, NY, NX)
-        gas = np.asarray(restart["SGAS", year], dtype=float).reshape(NZ, NY, NX)
+        current = expand(restart["PRESSURE", year])
+        gas = expand(restart["SGAS", year])
         pressure.append(np.maximum(current - initial, 0).mean(axis=0))
         saturation.append(gas.max(axis=0) * 100)
     return np.stack(pressure), np.stack(saturation)
@@ -107,11 +117,9 @@ def main() -> None:
     data = json.loads(SITE_DATA.read_text(encoding="utf-8"))
     reservoir = next(item for item in data["reservoirs"] if item["id"] == "gassum")
     points = reservoir["points"]
-    lon_min, lon_max = min(p["lon"] for p in points), max(p["lon"] for p in points)
-    lat_min, lat_max = min(p["lat"] for p in points), max(p["lat"] for p in points)
     for point in points:
-        i = int(round((point["lon"] - lon_min) / (lon_max - lon_min) * (NX - 1)))
-        j = int(round((point["lat"] - lat_min) / (lat_max - lat_min) * (NY - 1)))
+        grid_i, grid_j = nearest_grid_cell(point["lon"], point["lat"], GEOLOGY)
+        i, j = grid_i - 1, grid_j - 1
         point["scenario_pressure_bar"] = {
             scenario: quantiles(values[0], j, i) for scenario, values in arrays.items()
         }
@@ -122,15 +130,17 @@ def main() -> None:
         point["co2_saturation"] = point["scenario_co2_saturation"]["open_alpha"]
 
     def grid_location(i: int, j: int) -> dict[str, float]:
+        index = (j - 1) * NX + (i - 1)
         return {
-            "lon": round(lon_min + (i - 1) / (NX - 1) * (lon_max - lon_min), 6),
-            "lat": round(lat_min + (j - 1) / (NY - 1) * (lat_max - lat_min), 6),
+            "lon": GEOLOGY["longitude"][index],
+            "lat": GEOLOGY["latitude"][index],
         }
 
-    reservoir["reference_injector"] = grid_location(30, 25)
+    cells = project_cells(GEOLOGY)
+    reservoir["reference_injector"] = grid_location(*cells["alpha"])
     reservoir["storage_projects"] = [
-        {"id": "alpha", "name": "Storage Alpha", "enabled": True, "rate_mt_yr": 1.0, **grid_location(30, 25)},
-        {"id": "beta", "name": "Storage Beta", "enabled": False, "rate_mt_yr": 1.0, **grid_location(28, 20)},
+        {"id": "alpha", "name": "Storage Alpha", "enabled": True, "rate_mt_yr": 1.0, **grid_location(*cells["alpha"])},
+        {"id": "beta", "name": "Storage Beta", "enabled": False, "rate_mt_yr": 1.0, **grid_location(*cells["beta"])},
         {"id": "zeta", "name": "Storage Zeta", "enabled": False, "rate_mt_yr": 1.0, "cell_id": 192, "lon": points[191]["lon"], "lat": points[191]["lat"]},
     ]
     reservoir["fault_scenarios"] = {
@@ -141,8 +151,14 @@ def main() -> None:
         "response_method": "unit-rate OPM responses superposed for 1, 2 and 3 Mt/yr screening",
     }
     reservoir["ensemble_size"] = len(CASES)
-    reservoir["ensemble_design"] = "L9 property ensemble for each all-fault state and Alpha/Beta/Zeta unit response"
-    data["model_version"] = "decode-pressure-opm-all-faults-0.6.0"
+    reservoir["ensemble_design"] = "L9 perturbations around mapped geology for each all-fault state and Alpha/Beta/Zeta unit response"
+    reservoir["geological_model"] = {
+        "geometry": GEOLOGY["source"]["geometry"],
+        "properties": ["porosity", "permeability", "net-to-gross", "gross thickness"],
+        "surface_cells": NX * NY,
+        "active_surface_cells": sum(GEOLOGY["active"]),
+    }
+    data["model_version"] = "pressure-space-opm-geological-0.8.0"
     SITE_DATA.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")
     print(SITE_DATA)
 

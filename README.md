@@ -15,6 +15,10 @@ permitting model.
 - The Gassum view uses 81 completed OPM Flow 2026.04 `CO2STORE` runs: nine
   property realizations, three all-fault transmissibility states, and unit-rate
   responses for Storage Alpha, Beta, and Zeta over a 20-year injection period.
+- The OPM grid uses the DECODE EarthVision Top Gassum and Top Vinding surfaces,
+  plus spatial porosity, permeability and net-to-gross sampled from the 500 m
+  Gassum property model. The ensemble perturbs those mapped values rather than
+  replacing them with homogeneous rock properties.
 - The interface reads simulated cell pressure and `SGAS` directly from OPM
   restart files and exposes pressure P10/P50/P90 plus a CO2 plume layer.
 - The map includes wheel/button zoom, drag pan, OpenStreetMap, four geological
@@ -27,7 +31,8 @@ permitting model.
   Every trace receives the selected open (1.0), semi-open (0.05), or closed
   (0.0001) transmissibility multiplier.
 - Storage Alpha and Beta are explicit screening placements. Storage Zeta is at
-  Cell 192 (OPM I=43, J=9). They are not optimized or proposed development locations.
+  Cell 192 (OPM I=30, J=5 on the geological grid). They are not optimized or
+  proposed development locations.
 - Beta and Zeta can each be screened at 1, 2, or 3 Mt CO2/year. The browser
   superposes their 1 Mt/year OPM response increments on Alpha; this is a fast
   screening approximation rather than a fully coupled nonlinear combination.
@@ -36,8 +41,8 @@ permitting model.
   borderline; shallow Chalk is excluded.
 - The other formations retain the 160-member analytical proxy and are labelled
   separately in the interface.
-- `opm/build_deck.py` generates a regional model with configurable rate,
-  duration, permeability, porosity, and thickness.
+- `opm/build_deck.py` generates the geological regional model with configurable
+  rate, duration, property perturbations and fault state.
 
 ## Model transparency
 
@@ -48,7 +53,8 @@ are published with the site:
 - [`dist/model/MODEL_ASSUMPTIONS.md`](dist/model/MODEL_ASSUMPTIONS.md) — readable technical disclosure;
 - [`dist/data/model-manifest.json`](dist/data/model-manifest.json) — machine-readable parameters and limitations;
 - [`dist/model/GASSUM_REFERENCE.DATA`](dist/model/GASSUM_REFERENCE.DATA) — generated reference OPM deck; and
-- [`opm/`](opm/) — deck generator and ensemble runners.
+- [`opm/data/gassum-geological-grid.json`](opm/data/gassum-geological-grid.json) — compact mapped grid input; and
+- [`opm/`](opm/) — geological exporter, deck generator and ensemble runners.
 
 The disclosure distinguishes the user-configured pressure screening limit from
 a calibrated geomechanical, fracture-pressure, or fault-reactivation limit.
@@ -93,15 +99,15 @@ GitHub Actions workflow in `.github/workflows/pages.yml`.
 ## OPM runtime on Windows
 
 OPM runs in the installed Ubuntu 24.04 WSL2 distribution. OPM Flow 2026.04 and
-its Python bindings have been verified on this machine. The initial 18,000-cell,
-240-report validation case, nine base ensemble cases, and all 81 all-fault and
-interference response cases completed successfully.
+its Python bindings have been verified on this machine. The current grid has
+41 × 28 × 6 cells (6,816 active), and all 81 geological all-fault/interference
+response cases complete successfully.
 
 ## Scientific boundary
 
-The included deck is a generic regional screening model, not a calibrated
-Gassum field model. Permeability architecture, boundaries, vertical
-communication, PVT, relative permeability, faults, stresses, pressure limits,
-well deliverability, and thermal coupling require calibration before engineering
-or regulatory use.
+The included deck represents mapped regional structure and petrophysics, but it
+is not a history-matched Gassum field model. Facies-scale architecture,
+boundaries, vertical communication, PVT, relative permeability, faults,
+stresses, pressure limits, well deliverability, and thermal coupling require
+calibration before engineering or regulatory use.
 

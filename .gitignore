@@ -1,4 +1,6 @@
 opm/runs/output/
+opm/runs/GEOLOGICAL_VALIDATION.DATA
+opm/runs/geo-validation-output/
 opm/ensemble-runs/
 opm/scenario-runs/
 __pycache__/
