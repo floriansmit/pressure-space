@@ -135,7 +135,8 @@ def build_calibration() -> dict:
 def main() -> None:
     calibration = build_calibration()
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(json.dumps(calibration, indent=2, ensure_ascii=False), encoding="utf-8")
+    with OUTPUT.open("w", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(calibration, indent=2, ensure_ascii=False) + "\n")
     print(OUTPUT)
 
 
