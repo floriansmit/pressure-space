@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.12.1">
+  <link rel="stylesheet" href="styles.css?v=0.12.2">
 </head>
 <body>
   <div class="app-shell">
@@ -113,7 +113,7 @@
         <div id="mapTooltip" class="map-tooltip" hidden></div>
       </div>
       <section id="sectionPanel" class="cross-section" hidden>
-        <header><div><p class="eyebrow">A–A′ synchronized section</p><strong id="sectionTitle">Gassum Formation · Year 12 · P50</strong></div><div class="section-actions"><span id="sectionStatus">Loading layer data…</span><button id="drawSection" type="button">Draw A–A′</button><button id="closeSection" type="button" aria-label="Close cross section">×</button></div></header>
+        <header><div><p class="eyebrow">A–A′ synchronized section</p><strong id="sectionTitle">Gassum Formation · Year 12 · P50</strong></div><div class="section-actions"><span id="sectionStatus">Loading layer data…</span><div class="section-zoom" role="group" aria-label="Cross-section zoom"><button id="sectionZoomOut" type="button" aria-label="Zoom section out">−</button><output id="sectionZoomValue">1×</output><button id="sectionZoomIn" type="button" aria-label="Zoom section in">+</button><button id="sectionZoomFit" type="button">Fit</button></div><button id="drawSection" type="button">Draw A–A′</button><button id="closeSection" type="button" aria-label="Close cross section">×</button></div></header>
         <canvas id="sectionCanvas" role="img" aria-label="Cross section through the six-layer reservoir model"></canvas>
         <div id="sectionTooltip" class="section-tooltip" hidden></div>
       </section>
@@ -209,6 +209,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.12.1"></script>
+  <script src="app.js?v=0.12.2"></script>
 </body>
 </html>

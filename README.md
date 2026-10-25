@@ -44,6 +44,8 @@ permitting model.
   saturation for the active duration, fault state and project combination.
   Fault intersections, nearby legacy wells and storage locations are shown in
   the section, and users can replace the default line with two map clicks.
+  The section supports button and mouse-wheel zoom up to 8×, with cursor-centred
+  wheel zoom and a Fit control to restore the complete A–A′ line.
 - The year control includes Play/Pause and 0.5×, 1×, 2× and 4× speeds; map,
   section, plume and selected-cell metrics remain synchronized during playback.
 - All 29 supplied faults are represented together as vertical Gassum baffles.
