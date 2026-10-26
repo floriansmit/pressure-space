@@ -101,7 +101,8 @@
             <button id="sceneSurface" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch data"></i><span>Gassum data surface<small id="sceneSurfaceCaption">Pressure change · P50</small></span></button>
             <button id="sceneFaults" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch faults"></i><span>Fault set<small>29 vertical fault curtains</small></span></button>
             <button id="sceneWells" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch wells"></i><span>Legacy well paths<small>8 vertical screening paths</small></span></button>
-            <label>Vertical exaggeration <strong id="verticalExaggerationValue">1.8×</strong><input id="verticalExaggeration" type="range" min="1" max="3" step="0.1" value="1.8"></label>
+            <label>Vertical exaggeration <strong id="verticalExaggerationValue">10×</strong><input id="verticalExaggeration" type="range" min="1" max="50" step="1" value="10"></label>
+            <p>At 1×, horizontal distance and vertical relief use the same metre scale.</p>
             <p>Well paths use supplied collar positions and assumed vertical traces; deviation surveys are not available in this model.</p>
           </div>
         </div>
@@ -209,6 +210,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.12.2"></script>
+  <script src="app.js?v=0.12.3"></script>
 </body>
 </html>
