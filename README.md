@@ -126,12 +126,88 @@ GitHub Actions workflow in `.github/workflows/pages.yml`.
 - Repository: https://github.com/floriansmit/pressure-space
 - Published site: https://floriansmit.github.io/pressure-space/
 
-## OPM runtime on Windows
+## Install OPM on Windows
 
-OPM runs in the installed Ubuntu 24.04 WSL2 distribution. OPM Flow 2026.04 and
-its Python bindings have been verified on this machine. The current grid has
-41 × 28 × 6 cells (6,816 active), and all 405 geological all-fault/interference
-response cases complete successfully.
+PressureSpace runs OPM Flow in Ubuntu on WSL2. OPM is not a native Windows
+executable, so install WSL2 first and run the simulator from the Ubuntu shell.
+The commands below target Ubuntu 24.04, which has official OPM binary packages.
+
+### 1. Install WSL2 and Ubuntu 24.04
+
+Open **PowerShell as Administrator** and run:
+
+```powershell
+wsl --install --distribution Ubuntu-24.04
+```
+
+Restart Windows when prompted. Then launch **Ubuntu 24.04** from the Start menu
+and create the Linux username and password requested by Ubuntu. Confirm that
+the distribution is using WSL2 from PowerShell:
+
+```powershell
+wsl --list --verbose
+wsl --set-version Ubuntu-24.04 2
+```
+
+If `wsl --install` is unavailable, enable the Windows features requested by
+Windows, restart, and run the command again. Microsoft’s current WSL
+instructions are available at <https://learn.microsoft.com/windows/wsl/install>.
+
+### 2. Install OPM Flow in Ubuntu
+
+Run the following commands in the **Ubuntu** terminal, not PowerShell:
+
+```bash
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y ppa:opm/ppa
+sudo apt update
+sudo apt install -y mpi-default-bin libopm-simulators-bin \
+  python3-opm-common python3-opm-simulators
+```
+
+The packages include the `flow` executable and the optional Python bindings.
+Verify the installation:
+
+```bash
+command -v flow
+flow --version
+```
+
+The package names and repository are documented by OPM at
+<https://opm-project.org/?page_id=245>.
+
+### 3. Run this repository with OPM
+
+The Windows checkout is available inside WSL under `/mnt`. From Ubuntu:
+
+```bash
+cd /mnt/d/python/pressure-space
+python3 opm/build_deck.py --rate 1.2 --years 20
+flow opm/runs/GASSUM_BASE.DATA --output-dir=opm/runs/output
+```
+
+To run the repository’s ensemble workflow:
+
+```bash
+cd /mnt/d/python/pressure-space/opm
+python3 run_interference_scenarios.py
+```
+
+If the repository is stored on another Windows drive, replace `/mnt/d` with
+the corresponding WSL mount (for example, `C:\\` is `/mnt/c`).
+
+The helper script [`opm/install-opm-ubuntu.sh`](opm/install-opm-ubuntu.sh)
+performs the OPM package installation step from Ubuntu:
+
+```bash
+cd /mnt/d/python/pressure-space
+bash opm/install-opm-ubuntu.sh
+```
+
+The current grid has 41 × 28 × 6 cells (6,816 active). After installation,
+the generated OPM cases can be used to reproduce the 405 geological
+all-fault/interference response cases.
 
 ## Scientific boundary
 
