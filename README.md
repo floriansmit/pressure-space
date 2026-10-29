@@ -209,6 +209,67 @@ The current grid has 41 × 28 × 6 cells (6,816 active). After installation,
 the generated OPM cases can be used to reproduce the 405 geological
 all-fault/interference response cases.
 
+## Area C regional pressure-interference model
+
+The repository also contains a larger regional screening model built from the
+supplied Area C EarthVision horizons and well tops. The Area C horizon exports
+are 284 × 232 at approximately 2.5 km spacing, but using that resolution would
+create roughly 66,000 horizontal columns before adding vertical layers. The
+regional model therefore uses a 5 km × 5 km grid with six layers:
+
+- 58 × 55 × 6 cells (19,140 total cells); and
+- 1,953 active surface columns after the 800 m depth, gross-thickness and
+  caprock-thickness screening.
+
+This resolution is intended to show pressure interference over roughly
+100–300 km while keeping multi-site OPM runs practical. It is not intended to
+resolve near-well injectivity, faults at field scale, or plume geometry around
+individual wells.
+
+The builder uses the supplied depth-domain Top Fjerritslev, Top Gassum and Top
+Vinding horizons directly in metres TVDSS; no TWT-to-depth conversion is
+performed. Before resampling, it keeps only co-located, stratigraphically
+ordered horizon triplets and excludes EarthVision no-data/sentinel values.
+Top Fjerritslev is used as the seal horizon and as an additional
+caprock-thickness screening check. NTG and temperature currently use regional
+screening defaults because a complete Area C property cube is not included
+with the horizon files.
+
+Regenerate the regional grid and site inventory:
+
+```powershell
+uv run python opm/build_regional_area_c.py
+```
+
+Generate a multi-site regional OPM deck, with all active in-domain reference
+sites injecting 1 Mt CO2/year each:
+
+```powershell
+uv run python opm/build_regional_deck.py --years 20 --injection-years 20 --output opm/runs/AREA_C_REGIONAL.DATA
+```
+
+Generate a smaller scenario using selected sites:
+
+```powershell
+uv run python opm/build_regional_deck.py --sites "Gassum,Stenlille,Aarhus geothermal" --rate 1 --years 20 --injection-years 10 --output opm/runs/AREA_C_GASSUM_STENLILLE_AARHUS.DATA
+```
+
+The generated site inventory includes the Energistyrelsen storage structures
+Gassum, Thorning, Havnsø, Stenlille, Rødby, Jammerbugt, Lisa and Inez, plus
+Thisted, Aarhus and Copenhagen/Amager geothermal references. The inventory
+also records whether each reference falls inside the horizon footprint and
+whether its nearest 5 km column passes the CO2 screening rules. For example,
+Thisted is retained but is currently shallower than the 800 m supercritical
+CO2 threshold, so it is not selected by the CO2 deck generator. Inez is
+outside the Area C horizon footprint and is retained as a reference marker.
+Storage-area status and boundaries must be treated as screening information;
+see the [Danish Energy Agency overview of CO2 storage licences and planning
+areas](https://ens.dk/en/supply-and-consumption/licenses-exploration-and-storage-co2-including-environmental-consultation).
+
+The generated artifacts are [`opm/data/regional-area-c-geological-grid.json`](opm/data/regional-area-c-geological-grid.json),
+[`opm/build_regional_area_c.py`](opm/build_regional_area_c.py), and
+[`opm/build_regional_deck.py`](opm/build_regional_deck.py).
+
 ## Scientific boundary
 
 The included deck represents mapped regional structure and petrophysics, but it
