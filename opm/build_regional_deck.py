@@ -41,7 +41,7 @@ def build_deck(case: str, rate: float, years: int, injection_years: int, selecte
     winjgas = "\n".join(f"{well} STREAM CO2STREAM /" for well in names)
     wconinje = "\n".join(f"{well} GAS OPEN RATE {round(rate_sm3_day)} 1* 285 /" for well in names)
     shut = "\n".join(f"{well} GAS SHUT RATE 0 1* 285 /" for well in names)
-    summary = "\n".join(f"'{well}' /" for well in names)
+    summary = "\n".join(f"'{well}'" for well in names)
     if len(names) > 30:
         raise ValueError("Too many sites for the deck WELLDIMS")
     shut_schedule = ""
@@ -74,7 +74,7 @@ EQLDIMS
 REGDIMS
 10 1 0 1 0 /
 WELLDIMS
-{max(4, len(names))} 30 1 3 /
+{max(4, len(names))} 30 1 4 /
 GASWAT
 UNIFOUT
 UNIFIN
@@ -103,7 +103,7 @@ MULTIPLY
 PORV 1000000 1 1 1 {ny} 1 {nz} /
 PORV 1000000 {nx} {nx} 1 {ny} 1 {nz} /
 PORV 1000000 1 {nx} 1 1 1 {nz} /
-PORV 1000000 1 {nx} 1 {ny} {ny} 1 {nz} /
+PORV 1000000 1 {nx} 1 {ny} {nz} {nz} /
 /
 
 PROPS
@@ -143,9 +143,9 @@ RPTRST
 SUMMARY
 ALL
 WBHP
-{summary}
+{summary} /
 WGIR
-{summary}
+{summary} /
 
 SCHEDULE
 RPTRST
