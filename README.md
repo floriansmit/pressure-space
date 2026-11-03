@@ -5,6 +5,19 @@ geothermal operations, backed by OPM Flow ensemble simulations.
 
 **Live application:** https://floriansmit.github.io/pressure-space/
 
+> [!IMPORTANT]
+> **Visualization proof of concept—not a pressure-capacity assessment.**
+> PressureSpace demonstrates an interactive workflow for exploring regional
+> pressure interference, CO2 migration, faults and geothermal interactions.
+> The pressure constraint in the interface is a user-configured illustrative
+> threshold; it has not been calibrated to fracture pressure, fault
+> reactivation or induced seismicity. The ensemble also does not sample all
+> major uncertainties, including relative permeability and capillary pressure,
+> aquifer support, structural and fault uncertainty, PVT, geomechanics or well
+> performance. Results must not be interpreted as available storage capacity,
+> a safe injection envelope, a forecast, or evidence for engineering,
+> investment, permitting or regulatory decisions.
+
 PressureSpace explores how injection projects, geothermal operations, and fault
 transmissibility interact across a shared pressure system. It is designed as a
 screening and scenario-comparison tool rather than a calibrated engineering or
@@ -276,5 +289,10 @@ The included deck represents mapped regional structure and petrophysics, but it
 is not a history-matched Gassum field model. Facies-scale architecture,
 boundaries, vertical communication, PVT, relative permeability, faults,
 stresses, pressure limits, well deliverability, and thermal coupling require
-calibration before engineering or regulatory use.
+calibration before engineering or regulatory use. The published ensemble varies
+porosity, permeability, gross thickness and shared fault transmissibility, but
+it is not a comprehensive uncertainty study: relative-permeability and
+capillary-pressure sensitivity, structural uncertainty, aquifer-strength
+sensitivity, fault-specific properties, PVT uncertainty and coupled
+geomechanics have not been evaluated.
 

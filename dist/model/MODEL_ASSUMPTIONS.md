@@ -5,6 +5,13 @@ screening ensemble. The model is reproducible, but it is not history matched or
 calibrated for engineering design, induced-seismicity assessment, operational
 approval or permitting.
 
+> **Proof-of-concept disclaimer:** this model demonstrates an interactive
+> visualization and scenario-screening workflow. It does not quantify validated
+> available pressure space. The interface pressure constraint is a
+> user-configured illustrative threshold, and the ensemble is not a comprehensive
+> uncertainty study. Outputs are not storage-capacity estimates, safe injection
+> envelopes, forecasts, or evidence for engineering or regulatory decisions.
+
 ## Geological grid
 
 - OPM Flow 2026.04 in `CO2STORE` mode with CO2 and H2O components.
@@ -153,6 +160,13 @@ behaviour, induced-seismicity probability, well injectivity calibration or
 permit-ready operating limits. The pressure constraint selected in the
 interface is a screening threshold, not a calibrated fracture-pressure or
 fault-reactivation limit.
+
+The published ensemble varies porosity, permeability, gross thickness and a
+shared all-fault transmissibility state. It does not evaluate sensitivity to
+relative-permeability or capillary-pressure functions, structural uncertainty,
+aquifer strength, fault-specific properties, PVT uncertainty, geomechanical
+parameters or well-performance uncertainty. Those omissions can materially
+change pressure propagation, injectivity and plume behaviour.
 
 See `data/model-manifest.json`, `model/GASSUM_REFERENCE.DATA`, and the source
 under `opm/` for complete reproduction details.

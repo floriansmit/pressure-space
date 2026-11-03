@@ -89,6 +89,8 @@
     "The lateral boundary treatment is a screening approximation and has not been calibrated to regional aquifer support.",
     "No coupled geomechanics, thermal coupling, stress-dependent fault behaviour or induced-seismicity probability is simulated.",
     "The interface pressure constraint is user-configured and is not a calibrated fracture-pressure or fault-reactivation threshold.",
+    "This is a visualization proof of concept, not a validated pressure-capacity assessment; displayed headroom is not available storage capacity or a safe injection envelope.",
+    "The ensemble does not evaluate sensitivity to relative-permeability or capillary-pressure functions, structural uncertainty, aquifer strength, fault-specific properties, PVT, geomechanics or well performance.",
     "Multi-project controls use linear unit-response superposition rather than a new fully coupled OPM run.",
     "Only the five published injection durations are available; the interface does not interpolate between shut-in schedules.",
     "Project-rate and multi-project controls still use unit-response scaling/superposition rather than a new nonlinear OPM run for every combination."
