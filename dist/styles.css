@@ -45,3 +45,26 @@ dialog{width:min(560px,calc(100% - 32px));padding:25px;color:var(--text);backgro
   .view-toggle button,.percentiles button{padding:0 8px}
   .section-toggle{padding:0 7px}
 }
+
+/* Collapsible 3D layer palette: unobstructed model by default on phones. */
+.layers-toggle{display:none}
+.viewer-layers-content>div{display:flex;align-items:center;justify-content:space-between;padding:11px;border-bottom:1px solid #323944}
+.viewer-layers-content>div strong{font-size:.72rem}
+.viewer-layers-content>div small{color:#747d87;font-size:.57rem}
+.viewer-layers-content>button{width:100%;display:grid;grid-template-columns:11px minmax(0,1fr);align-items:center;gap:8px;padding:9px 11px;color:#7e8791;background:transparent;border:0;border-bottom:1px solid #29313a;text-align:left;cursor:pointer}
+.viewer-layers-content>button:hover{background:#222a33}
+.viewer-layers-content>button.enabled{color:#d9d7cf}
+.viewer-layers-content>button>span{display:grid;gap:2px;font-size:.67rem}
+.viewer-layers-content>button small{color:#747d87;font-size:.55rem}
+.viewer-layers-content>label{display:grid;grid-template-columns:1fr auto;gap:5px;padding:11px;color:#9ba2ab;font-size:.6rem}
+.viewer-layers-content>label strong{color:#ded9ca;font:650 .62rem ui-monospace,monospace}
+.viewer-layers-content>p{margin:0;padding:0 11px 11px;color:#747d87;font-size:.53rem;line-height:1.45}
+@media(max-width:720px){
+  .viewer-layers{width:min(190px,calc(100% - 16px));max-height:calc(100% - 66px);overflow:auto}
+  .viewer-layers:not(.expanded){width:auto;max-height:none;overflow:visible}
+  .layers-toggle{width:100%;min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:0 12px;border:0;color:#e4dfd2;background:#19212a;font-size:.72rem;font-weight:650;cursor:pointer;touch-action:manipulation}
+  .layers-toggle span{font-size:1rem;transition:transform .15s}
+  .viewer-layers.expanded .layers-toggle span{transform:rotate(180deg)}
+  .viewer-layers:not(.expanded) .viewer-layers-content{display:none}
+  .viewer-layers.expanded .viewer-layers-content>div:first-child{display:none}
+}
