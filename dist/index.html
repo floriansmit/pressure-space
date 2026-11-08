@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.12.5">
+  <link rel="stylesheet" href="styles.css?v=0.12.6">
 </head>
 <body>
   <div class="app-shell">
@@ -172,8 +172,8 @@
         <div><dt>Cell size</dt><dd>2,000 × 2,000 m</dd></div>
         <div><dt>Reservoir top</dt><dd>EarthVision Top Gassum · 948–2,341 m</dd></div>
         <div><dt>Gross interval</dt><dd>Top Gassum–Top Vinding · up to 224 m</dd></div>
-        <div><dt>Lateral boundary</dt><dd>Each edge operation: pore volume × 1,000,000</dd></div>
-        <div><dt>Top and base</dt><dd>No-flow</dd></div>
+        <div><dt>Lateral boundaries (W/E/N/S)</dt><dd>Boundary-cell pore volume × 1,000,000; approximate regional pressure buffering, not fixed pressure</dd></div>
+        <div><dt>Top and base</dt><dd>No-flow (impermeable)</dd></div>
       </dl></section>
       <section><p class="eyebrow">Rock &amp; fluids</p><dl>
         <div><dt>Horizontal permeability</dt><dd>Sand-calibrated 110–1,670 mD · log-space ensemble</dd></div>
@@ -183,7 +183,7 @@
         <div><dt>Net-to-gross</dt><dd>Mapped 0.365–0.561</dd></div>
         <div><dt>Rock compressibility</dt><dd>5×10⁻⁵ bar⁻¹</dd></div>
         <div><dt>Temperature</dt><dd>50.9 °C regional median</dd></div>
-        <div><dt>Initial pressure</dt><dd>180 bar at 1,800 m datum</dd></div>
+        <div><dt>Initial pressure</dt><dd>Hydrostatic, 180 bar at 1,800 m datum</dd></div>
       </dl></section>
       <section><p class="eyebrow">Operations</p><dl>
         <div><dt>Simulator</dt><dd>OPM Flow 2026.04 · CO2STORE</dd></div>
