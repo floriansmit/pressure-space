@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Interactive regional pressure-management screening for CO2 storage and geothermal operations.">
   <title>DECODE Pressure Space</title>
-  <link rel="stylesheet" href="styles.css?v=0.12.3">
+  <link rel="stylesheet" href="styles.css?v=0.12.4">
 </head>
 <body>
   <div class="app-shell">
@@ -96,7 +96,9 @@
           <div class="viewer-toolbar" aria-label="3D camera controls">
             <button id="sceneZoomIn" type="button" aria-label="Zoom 3D view in">+</button><button id="sceneZoomOut" type="button" aria-label="Zoom 3D view out">−</button><button id="sceneTop" class="top-view" type="button" title="Top view">TOP</button><button id="sceneReset" type="button" title="Reset 3D view" aria-label="Reset 3D view">↻</button>
           </div>
-          <div class="viewer-layers">
+          <div class="viewer-layers" id="viewerLayers">
+            <button id="layersToggle" class="layers-toggle" type="button" aria-controls="viewerLayersContent" aria-expanded="false">▱ Layers <span aria-hidden="true">▾</span></button>
+            <div id="viewerLayersContent" class="viewer-layers-content">
             <div><strong>▱ Layers</strong><small>Pressure model</small></div>
             <button id="sceneSurface" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch data"></i><span>Gassum data surface<small id="sceneSurfaceCaption">Pressure change · P50</small></span></button>
             <button id="sceneFaults" class="enabled" type="button" aria-pressed="true"><i class="layer-swatch faults"></i><span>Fault set<small>29 vertical fault curtains</small></span></button>
@@ -104,6 +106,7 @@
             <label>Vertical exaggeration <strong id="verticalExaggerationValue">10×</strong><input id="verticalExaggeration" type="range" min="1" max="50" step="1" value="10"></label>
             <p>At 1×, horizontal distance and vertical relief use the same metre scale.</p>
             <p>Well paths use supplied collar positions and assumed vertical traces; deviation surveys are not available in this model.</p>
+            </div>
           </div>
         </div>
         <div id="osmAttribution" class="osm-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap contributors</a> · <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noreferrer">Report map issue</a></div>
@@ -211,6 +214,6 @@
     <form method="dialog"><button class="primary-button">Close</button></form>
   </dialog>
 
-  <script src="app.js?v=0.12.3"></script>
+  <script src="app.js?v=0.12.4"></script>
 </body>
 </html>
