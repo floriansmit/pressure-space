@@ -15,3 +15,33 @@ dialog{width:min(560px,calc(100% - 32px));padding:25px;color:var(--text);backgro
 .playback-controls{display:flex;align-items:center;gap:7px}.playback-controls button,.playback-controls select,.section-toggle,.section-actions button{height:30px;border:1px solid #424b57;background:#202731;color:#d8d5cc;cursor:pointer}.playback-controls button{min-width:76px}.playback-controls button.playing{color:#171711;background:var(--gold);border-color:var(--gold)}.playback-controls label{margin-left:auto;display:flex;align-items:center;gap:6px;color:#89929c;font-size:.6rem}.playback-controls select{padding:0 5px}.section-toggle{padding:0 11px;font-size:.62rem}.section-toggle.active{background:var(--gold);border-color:var(--gold);color:#171711}.map-panel.section-open .map-canvas{min-height:350px;margin-bottom:8px}.cross-section{position:relative;flex:0 0 225px;margin:0 16px 16px;border:1px solid #343d48;background:#11161d;overflow:hidden}.cross-section[hidden]{display:none}.cross-section header{height:42px;display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-bottom:1px solid #303844;background:#171d25}.cross-section header p{margin:0 0 2px}.cross-section header strong{display:block;font-size:.67rem}.section-actions{display:flex;align-items:center;gap:7px}.section-actions span{color:#7f8993;font-size:.57rem}.section-actions button{padding:0 9px;font-size:.61rem}.section-actions button:last-child{width:30px;padding:0;font-size:1rem}.section-actions button.drawing{color:#171711;background:var(--gold)}#sectionCanvas{display:block;width:100%;height:182px}.section-tooltip{position:absolute;z-index:4;pointer-events:none;padding:7px 9px;color:#ece8de;background:#10151bea;border:1px solid #4a5561;font-size:.59rem;box-shadow:0 8px 20px #0007}.section-tooltip strong,.section-tooltip span{display:block}.section-tooltip span{margin-top:2px;color:#929ca7}.section-line{fill:none;stroke:#fff2ad;stroke-width:3;stroke-dasharray:10 6;filter:drop-shadow(0 0 3px #000)}.section-end{fill:#10151b;stroke:#fff2ad;stroke-width:2}.section-label{fill:#fff2ad;font:700 12px "Segoe UI",sans-serif;paint-order:stroke;stroke:#10151b;stroke-width:3px}.map-canvas.drawing-section{cursor:crosshair}.map-canvas.drawing-section .model-cell{cursor:crosshair}@media(max-width:720px){.map-heading-actions{gap:4px}.section-toggle{padding:0 7px}.cross-section{margin:0 9px 9px;flex-basis:210px}.section-actions span{display:none}#sectionCanvas{height:168px}}
 .duration-scale{display:grid!important;grid-template-columns:repeat(5,1fr);margin-top:-2px;color:#707985!important;font:500 .52rem ui-monospace,monospace!important}.duration-scale small{text-align:center}.duration-scale small:first-child{text-align:left}.duration-scale small:last-child{text-align:right}
 .section-zoom{display:flex;align-items:center;border:1px solid #424b57}.section-zoom button{width:28px;padding:0;border:0;border-right:1px solid #424b57}.section-zoom button:last-child{width:32px;border:0;border-left:1px solid #424b57;font-size:.55rem}.section-zoom output{min-width:29px;text-align:center;color:#aeb6bf;font:.55rem ui-monospace,monospace}#sectionCanvas{cursor:zoom-in}@media(max-width:900px){.section-actions>span{display:none}.section-zoom output{display:none}.section-zoom button{width:25px}}
+
+/* Mobile map: give the SVG a definite viewport height instead of allowing its
+   intrinsic dimensions to stretch the flex item into a tall empty panel. */
+@media (max-width:720px){
+  .map-panel{min-height:0;display:flex;flex-direction:column}
+  .map-heading{height:auto;min-height:0;display:flex;flex-wrap:wrap;align-items:flex-start;gap:12px;padding:14px 12px}
+  .map-heading>div:first-child{min-width:0;flex:1 1 100%}
+  .map-heading h2{font-size:1.2rem;line-height:1.25;overflow-wrap:anywhere}
+  .map-heading-actions{width:100%;min-width:0;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:8px}
+  .view-toggle,.percentiles{flex:0 0 auto}
+  .map-canvas,.map-panel.section-open .map-canvas{
+    flex:0 0 auto;
+    width:calc(100% - 18px);
+    height:clamp(360px,58svh,560px);
+    min-height:0;
+    margin:9px;
+  }
+  .map-canvas svg#pressureMap{width:100%;height:100%;display:block}
+  .map-search{right:9px;width:auto;max-width:calc(100% - 18px);height:40px}
+  .map-search input{font-size:16px}
+  .map-search button{padding:0 9px;white-space:nowrap}
+  .map-controls{right:9px;top:58px}
+  .map-legend{max-width:calc(100% - 18px);width:min(235px,calc(100% - 18px))}
+  .osm-attribution{right:9px;bottom:73px;max-width:calc(100% - 18px);font-size:.47rem}
+}
+@media (max-width:380px){
+  .map-heading-actions{gap:5px}
+  .view-toggle button,.percentiles button{padding:0 8px}
+  .section-toggle{padding:0 7px}
+}
