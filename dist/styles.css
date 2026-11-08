@@ -68,3 +68,40 @@ dialog{width:min(560px,calc(100% - 32px));padding:25px;color:var(--text);backgro
   .viewer-layers:not(.expanded) .viewer-layers-content{display:none}
   .viewer-layers.expanded .viewer-layers-content>div:first-child{display:none}
 }
+
+/* Regression fix: the original .viewer-layers > div flex rule must not
+   turn the newly wrapped layer entries into a horizontal flex row. */
+.viewer-layers > .viewer-layers-content{display:block;padding:0;border:0;min-width:0}
+.viewer-layers > .viewer-layers-content > button{display:grid;grid-template-columns:11px minmax(0,1fr)}
+.viewer-layers > .viewer-layers-content > button > span{min-width:0;overflow-wrap:break-word}
+.viewer-layers > .viewer-layers-content > label{display:grid;grid-template-columns:minmax(0,1fr) auto}
+.viewer-layers > .viewer-layers-content > label input{grid-column:1/-1;min-width:0}
+@media(max-width:720px){
+  .viewer-layers > button.layers-toggle{display:flex;grid-template-columns:none;align-items:center;justify-content:space-between;gap:12px;width:100%}
+  .viewer-layers.expanded > .viewer-layers-content{display:block}
+  .viewer-layers:not(.expanded) > .viewer-layers-content{display:none}
+}
+/* iPhone landscape is wider than the 720px portrait breakpoint. Stack the
+   receptor details below the map rather than floating them over the model. */
+@media (max-width:1100px) and (max-height:600px) and (orientation:landscape){
+  html,body{height:auto;min-height:100%;overflow-x:hidden}
+  .app-shell{display:block;height:auto;min-height:100svh;overflow:visible}
+  .topbar{position:relative;height:auto;min-height:64px;flex-wrap:wrap}
+  .control-panel{display:flex;overflow:visible;border-right:0}
+  .map-panel{display:flex;flex-direction:column;min-height:0;overflow:visible}
+  .map-heading{height:auto;min-height:0;display:flex;flex-wrap:wrap;gap:10px;padding:13px}
+  .map-heading>div:first-child{min-width:0;flex:1 1 100%}
+  .map-heading-actions{display:flex;flex-wrap:wrap;gap:8px}
+  .map-canvas,.map-panel.section-open .map-canvas{flex:0 0 auto;height:clamp(310px,75svh,540px);min-height:0;margin:9px}
+  .detail-panel,.detail-panel:hover,.detail-panel:focus-within{
+    position:static;display:flex;transform:none;width:100%;height:auto;min-height:0;
+    box-shadow:none;border-left:0;overflow:visible;transition:none
+  }
+  .viewer-layers{right:8px;top:58px;width:min(220px,calc(100% - 16px));max-height:calc(100% - 66px)}
+  .viewer-layers:not(.expanded){width:auto;max-height:none;overflow:visible}
+  .viewer-layers > button.layers-toggle{display:flex;grid-template-columns:none;align-items:center;justify-content:space-between;gap:12px;width:100%}
+  .viewer-layers:not(.expanded) > .viewer-layers-content{display:none}
+  .viewer-layers.expanded > .viewer-layers-content{display:block}
+  .viewer-layers.expanded > .viewer-layers-content > div:first-child{display:none}
+  .viewer-instructions{display:none}
+}
