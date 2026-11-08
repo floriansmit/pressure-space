@@ -105,3 +105,31 @@ dialog{width:min(560px,calc(100% - 32px));padding:25px;color:var(--text);backgro
   .viewer-layers.expanded > .viewer-layers-content > div:first-child{display:none}
   .viewer-instructions{display:none}
 }
+
+/* Preserve the scientific disclosure controls on portrait phones.
+   Previously the entire status/actions group was hidden below 720px. */
+@media(max-width:720px) and (orientation:portrait){
+  .topbar{
+    height:auto;min-height:64px;position:relative;
+    display:flex;flex-wrap:wrap;align-items:center;
+    gap:8px 10px;padding:11px 14px;
+  }
+  .topbar .brand{min-width:0;flex:1}
+  .topbar-status{
+    display:flex;flex:1 1 100%;min-width:0;width:100%;margin:3px 0 0;
+    align-items:stretch;gap:8px;
+  }
+  .topbar-status .status-dot,.topbar-status #engineLabel,
+  .topbar-status .topbar-divider{display:none}
+  .topbar-status .text-button{
+    flex:1 1 0;min-width:0;min-height:42px;
+    display:flex;justify-content:center;align-items:center;
+    padding:8px 10px;border:1px solid #3a434e;
+    background:#202731;color:#dedbd1;
+    font-size:.73rem;line-height:1.25;white-space:normal;text-align:center;
+  }
+}
+@media(max-width:1100px) and (max-height:600px) and (orientation:landscape){
+  .topbar-status{display:flex;flex-wrap:wrap;gap:8px}
+  .topbar-status .text-button{min-height:38px}
+}
