@@ -23,6 +23,23 @@ transmissibility interact across a shared pressure system. It is designed as a
 screening and scenario-comparison tool rather than a calibrated engineering or
 permitting model.
 
+
+## Experimental Latin Hypercube uncertainty workflow
+
+A reproducible, opt-in Gassum LHS workflow is available in
+[`opm/lhs_experiment.py`](opm/lhs_experiment.py). It prepares a 60-case
+default sampling design and individual OPM Flow decks, with a serial and
+resumable workstation runner. The initial dimensions cover mapped
+permeability, porosity, gross thickness, Kv/Kh, rock compressibility,
+regional edge pore-volume support and categorical fault state.
+
+**No LHS OPM jobs have been executed or published.** This workflow does not
+replace the existing L9 ensemble, and relative-permeability, capillary-pressure
+and salinity sensitivities are not yet implemented. Review the sampling
+ranges and run a one-case local OPM validation before a full batch.
+
+See [LHS setup, commands and limitations](opm/LHS_README.md).
+
 ## What runs today
 
 - The Gassum view uses 405 completed OPM Flow 2026.04 `CO2STORE` runs: nine
