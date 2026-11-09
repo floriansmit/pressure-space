@@ -152,7 +152,16 @@ def build_deck(
     beta_rate_mt_yr: float = 0.0,
     zeta_rate_mt_yr: float = 0.0,
     injection_years: int | None = None,
+    vertical_to_horizontal_perm_ratio: float = 0.1,
+    rock_compressibility_per_bar: float = 5e-5,
+    boundary_pore_volume_multiplier: float = 1_000_000.0,
 ) -> str:
+    if not 0 < vertical_to_horizontal_perm_ratio <= 1:
+        raise ValueError('vertical_to_horizontal_perm_ratio must be in (0, 1]')
+    if not 0 < rock_compressibility_per_bar < 0.01:
+        raise ValueError('rock_compressibility_per_bar must be in (0, 0.01)')
+    if boundary_pore_volume_multiplier < 1:
+        raise ValueError('boundary_pore_volume_multiplier must be >= 1')
     geology = load_geology()
     nx, ny, nz = geology["nx"], geology["ny"], geology["nz"]
     top = geology["top_depth_m"]
@@ -162,7 +171,7 @@ def build_deck(
         top, gross, nx, ny, nz, geology["dx_m"], geology["dy_m"],
     )
     permx = [max(0.01, value * permeability_multiplier) for value in geology["permeability_md"]]
-    permz = [value * 0.1 for value in permx]
+    permz = [value * vertical_to_horizontal_perm_ratio for value in permx]
     porosity = [min(0.4, max(0.03, value * porosity_multiplier)) for value in geology["porosity"]]
     active = geology["active"]
     cells = project_cells(geology)
@@ -251,16 +260,16 @@ PERMZ
 
 EDIT
 MULTIPLY
-PORV 1000000 1 1 1 {ny} 1 {nz} /
-PORV 1000000 {nx} {nx} 1 {ny} 1 {nz} /
-PORV 1000000 1 {nx} 1 1 1 {nz} /
-PORV 1000000 1 {nx} {ny} {ny} 1 {nz} /
+PORV {boundary_pore_volume_multiplier:g} 1 1 1 {ny} 1 {nz} /
+PORV {boundary_pore_volume_multiplier:g} {nx} {nx} 1 {ny} 1 {nz} /
+PORV {boundary_pore_volume_multiplier:g} 1 {nx} 1 1 1 {nz} /
+PORV {boundary_pore_volume_multiplier:g} 1 {nx} {ny} {ny} 1 {nz} /
 {all_fault_face_keywords(fault_multiplier, nx, ny, nz)}
 /
 
 PROPS
 ROCK
-200 5e-05 /
+200 {rock_compressibility_per_bar:g} /
 RTEMP
 {median_temperature:g} /
 NCOMPS
