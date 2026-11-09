@@ -5,3 +5,5 @@ opm/ensemble-runs/
 opm/scenario-runs/
 __pycache__/
 *.pyc
+opm/lhs-runs/
+opm/lhs-project-*/
