@@ -133,3 +133,6 @@ dialog{width:min(560px,calc(100% - 32px));padding:25px;color:var(--text);backgro
   .topbar-status{display:flex;flex-wrap:wrap;gap:8px}
   .topbar-status .text-button{min-height:38px}
 }
+.ggs-return{display:inline-flex;align-items:center;min-height:34px;padding:0 11px;border:1px solid #46515d;color:#ddd9ce;background:#202630;text-decoration:none;font-size:.7rem;font-weight:700;white-space:nowrap}
+.ggs-return:hover,.ggs-return:focus-visible{color:#171711;background:var(--gold);border-color:var(--gold);outline:none}
+@media(max-width:380px){.topbar{gap:8px;padding-inline:12px}.ggs-return{padding-inline:8px}.brand-mark{display:none}}
